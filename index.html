@@ -83,6 +83,8 @@ td.y{white-space:nowrap;color:var(--muted)}
 .status.unseen{background:var(--unseen-bg);color:var(--unseen);border-color:var(--unseen)}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .foot{margin-top:14px;color:var(--muted);font-size:.85rem}
+.sync{font-weight:700}
+.sync.bad{color:#c0392b}
 .foot button{font:inherit;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
@@ -130,11 +132,13 @@ td.y{white-space:nowrap;color:var(--muted)}
       <tbody id="rows"></tbody>
     </table>
   </div>
-  <p class="foot">Astuce : touche une vignette pour y mettre ta propre image de couverture. Tout est enregistré sur cet appareil. <button id="reset" type="button">Tout réinitialiser</button></p>
+  <p class="foot">Astuce : touche une vignette pour y mettre ta propre image de couverture. Tes films vus et tes couvertures sont enregistrés dans Firebase. <span id="sync" class="sync"></span> <button id="reset" type="button">Tout réinitialiser</button></p>
   <input type="file" id="file" accept="image/*" hidden>
 </div>
 
-<script>
+<script type="module">
+import * as cloud from "./src/firebase.js";
+
 const FILMS=[
  {id:1,fr:"Nausicaä de la vallée du vent",en:"Nausicaä of the Valley of the Wind",y:1984,d:"Hayao Miyazaki"},
  {id:2,fr:"Le Château dans le ciel",en:"Castle in the Sky",y:1986,d:"Hayao Miyazaki"},
@@ -166,10 +170,41 @@ const FILMS=[
 let seen={}, covers={}, filter="all", picked=null, pendingCover=null;
 try{ seen=JSON.parse(localStorage.getItem("ghibli_seen")||"{}"); }catch(e){}
 try{ covers=JSON.parse(localStorage.getItem("ghibli_covers")||"{}"); }catch(e){}
-function save(){ try{localStorage.setItem("ghibli_seen",JSON.stringify(seen));}catch(e){} }
-function saveCovers(){ try{localStorage.setItem("ghibli_covers",JSON.stringify(covers));}catch(e){ alert("Image trop lourde : impossible de l'enregistrer."); } }
+// localStorage = cache local (affichage instantané + hors-ligne) ; Firebase = source partagée.
+function cacheSeen(){ try{localStorage.setItem("ghibli_seen",JSON.stringify(seen));}catch(e){} }
+function cacheCovers(){ try{localStorage.setItem("ghibli_covers",JSON.stringify(covers));}catch(e){ alert("Image trop lourde : impossible de l'enregistrer."); } }
 
 const $=id=>document.getElementById(id);
+
+/* ---------- synchronisation Firebase ---------- */
+const online=cloud.isConfigured();
+function setSync(txt,bad){ const el=$("sync"); el.textContent=txt; el.classList.toggle("bad",!!bad); }
+const onlySeen=o=>Object.fromEntries(Object.entries(o||{}).filter(([,v])=>v)); // ne garde que les films vus
+function cloudCall(fn){ if(!online) return; fn().then(()=>setSync("☁ Synchronisé")).catch(e=>{console.error(e);setSync("⚠ Échec de la synchronisation",true);}); }
+
+function startSync(){
+  if(!online){ setSync("Mode local : enregistré sur cet appareil seulement"); return; }
+  setSync("☁ Connexion…");
+  const onErr=e=>{ console.error(e); setSync("⚠ Firebase inaccessible (règles ou réseau)",true); };
+  // Document absent côté Firebase (1re ouverture) : on y envoie ce qui existait déjà en local.
+  const migrate=(name,local)=>{ if(Object.keys(local).length) cloud.pushAll(name,local).catch(onErr); };
+  cloud.subscribe("seen",s=>{
+    if(s.hasPendingWrites) return;
+    if(!s.exists){ migrate("seen",seen); return; }
+    seen=onlySeen(s.data); cacheSeen(); render(); setSync("☁ Synchronisé");
+  },onErr).catch(onErr);
+  cloud.subscribe("covers",s=>{
+    if(s.hasPendingWrites) return;
+    if(!s.exists){ migrate("covers",covers); return; }
+    covers=s.data; cacheCovers(); render(); if(picked) showResult(FILMS.find(f=>f.id===picked),false);
+  },onErr).catch(onErr);
+}
+
+function setSeen(id,v){
+  if(v) seen[id]=true; else delete seen[id];
+  cacheSeen(); render();
+  cloudCall(()=>cloud.setSeen(id,v));
+}
 let dirFilter="";
 const unseenList=()=>FILMS.filter(f=>!seen[f.id]&&(!dirFilter||f.d===dirFilter));
 
@@ -231,7 +266,7 @@ $("dir").innerHTML='<option value="">Tous les réalisateurs</option>'+dirs.map(d
 $("dir").addEventListener("change",e=>{dirFilter=e.target.value;render();});
 $("drawBtn").addEventListener("click",draw);
 $("rAgain").addEventListener("click",draw);
-$("rSeen").addEventListener("click",()=>{ if(picked){ seen[picked]=true; save(); render(); } });
+$("rSeen").addEventListener("click",()=>{ if(picked) setSeen(picked,true); });
 
 document.querySelector(".tabs").addEventListener("click",e=>{
   const b=e.target.closest(".tab"); if(!b) return;
@@ -241,7 +276,7 @@ document.querySelector(".tabs").addEventListener("click",e=>{
 });
 document.body.addEventListener("click",e=>{
   const s=e.target.closest("[data-seen]");
-  if(s){ const id=+s.dataset.seen; seen[id]=!seen[id]; if(!seen[id]) delete seen[id]; save(); render(); return; }
+  if(s){ const id=+s.dataset.seen; setSeen(id,!seen[id]); return; }
   const c=e.target.closest("[data-cover]");
   if(c){ pendingCover=+c.dataset.cover; $("file").value=""; $("file").click(); }
 });
@@ -252,7 +287,8 @@ $("file").addEventListener("change",e=>{
     const w=240, h=Math.round(w*1.45), cv=document.createElement("canvas"); cv.width=w; cv.height=h;
     const ctx=cv.getContext("2d"), s=Math.max(w/img.width,h/img.height), dw=img.width*s, dh=img.height*s;
     ctx.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);
-    covers[id]=cv.toDataURL("image/jpeg",.8); URL.revokeObjectURL(url); saveCovers(); render();
+    covers[id]=cv.toDataURL("image/jpeg",.8); URL.revokeObjectURL(url); cacheCovers(); render();
+    cloudCall(()=>cloud.setCover(id,covers[id]));
     if(picked===id) showResult(FILMS.find(f=>f.id===id),false);
   };
   img.src=url;
@@ -261,10 +297,12 @@ $("reset").addEventListener("click",()=>{
   if(confirm("Remettre tous les films à « Pas vu » et supprimer les couvertures ?")){
     seen={}; covers={}; picked=null; $("result").hidden=true;
     try{localStorage.removeItem("ghibli_seen");localStorage.removeItem("ghibli_covers");}catch(e){}
+    cloudCall(()=>cloud.resetAll());
     render();
   }
 });
 render();
+startSync();
 </script>
 </body>
 </html>

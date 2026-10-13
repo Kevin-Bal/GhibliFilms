@@ -1,0 +1,9 @@
+{
+  "name": "ghibli-films",
+  "version": "0.1.0",
+  "description": "Suivi des films Ghibli vus / pas vus, synchronisé via Firebase.",
+  "type": "module",
+  "scripts": {
+    "serve": "node scripts/serve.mjs"
+  }
+}
