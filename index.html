@@ -103,7 +103,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   .tablewrap{overflow-x:visible}
   table,tbody{display:block;min-width:0}
   thead{display:none}
-  tr{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"p t t" "p d d" "p s n";gap:2px 12px;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
+  tr{display:grid;grid-template-columns:auto 1fr auto auto;grid-template-areas:"p t t t" "p d d d" "p s r n";gap:2px 12px;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
   tr:last-child{border-bottom:0}
   td{display:block;padding:0;border:0}
   td.p{grid-area:p;align-self:start}
@@ -113,13 +113,44 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   td.d::before{content:attr(data-y) " · "}
   td.s{grid-area:s;margin-top:6px;justify-self:start}
   td.n{grid-area:n;margin-top:6px}
+  td.r{grid-area:r;margin-top:6px;justify-self:end}
+  td.r:empty{display:none}
   tr.picked{background:color-mix(in srgb,var(--accent) 22%,transparent)}
   tr.picked td{background:none}
   .poster{width:56px;height:80px}
 }
+.note{font-weight:900;white-space:nowrap}
+.note small{font-weight:400;color:var(--muted)}
+.rating-label{font-size:.85rem;font-weight:700;color:var(--muted);margin:0 0 4px}
+/* Calcifer : cadrage sur le visage de l'image (assets/calcifer.png, 447×447), taille pilotée par --s */
+.calc{--s:28px;display:inline-block;width:var(--s);height:var(--s);border-radius:50%;flex:none;
+  background:url("assets/calcifer.png") no-repeat;background-size:calc(var(--s)*2.35) calc(var(--s)*2.35);
+  background-position:calc(var(--s)*-.684) calc(var(--s)*-.474);
+  filter:grayscale(1) brightness(.55);opacity:.45;transition:filter .15s,opacity .15s,transform .15s}
+/* allumé : l'image orange est décalée en teinte (--hr) → bleu violacé (note 1) … rouge vif (note 10) */
+.calc.on{filter:hue-rotate(var(--hr,0deg)) saturate(1.6);opacity:1}
+.note .calc{--s:20px;vertical-align:-5px;margin-right:4px}
+.rating{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 6px}
+.rating button{background:none;border:0;padding:2px;cursor:pointer;border-radius:50%;line-height:0}
+.rating button:hover .calc{transform:scale(1.12)}
+.rating-val{font-size:.9rem;font-weight:700;margin:0 0 14px;min-height:1.4em}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.empty{text-align:center;color:var(--muted);padding:22px 12px}
 .sync{font-weight:700}
 .sync.bad{color:#c0392b}
 .foot button{font:inherit;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0}
+@media (max-width:640px){
+  tbody tr:hover td{background:none}
+  /* tactile : 2 rangées de 5 grosses cibles (≥ 44 px) plutôt que 10 minuscules */
+  .rating{display:grid;grid-template-columns:repeat(5,1fr);gap:6px 0;justify-items:center}
+  .rating button{padding:4px}
+  .rating .calc{--s:38px}
+  .fiche{padding:16px}
+  .fiche .poster{width:96px;height:136px}
+}
+@media (hover:none){.rating button:hover .calc{transform:none}}
+button{touch-action:manipulation}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -157,6 +188,7 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
       <button class="tab" data-f="unseen" aria-pressed="false" type="button">Pas vus</button>
       <button class="tab" data-f="seen" aria-pressed="false" type="button">Vus</button>
       <button class="tab" data-f="next" aria-pressed="false" type="button">Ma liste ★</button>
+      <button class="tab" data-f="rank" aria-pressed="false" type="button">Classement</button>
     </div>
     <div class="progress" id="progress"></div>
   </div>
@@ -164,11 +196,12 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 
   <div class="tablewrap">
     <table>
-      <thead><tr><th>Affiche</th><th>Film</th><th>Année</th><th>Réalisateur</th><th>Statut</th><th>Ma liste</th></tr></thead>
+      <thead><tr><th>Affiche</th><th>Film</th><th>Année</th><th>Réalisateur</th><th>Statut</th><th>Note</th><th>Ma liste</th></tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
-  <p class="foot">Tes films vus et ta liste sont enregistrés dans Firebase. <span id="sync" class="sync"></span> <button id="reset" type="button">Tout réinitialiser</button></p>
+  <p class="empty" id="empty" hidden></p>
+  <p class="foot">Tes films vus, tes notes et ta liste sont enregistrés dans Firebase. <span id="sync" class="sync"></span> <button id="reset" type="button">Tout réinitialiser</button></p>
   <dialog id="fiche" aria-labelledby="fTitle">
     <div class="fiche">
       <div class="poster" id="fPoster" role="img"><span></span></div>
@@ -176,6 +209,11 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
         <h2 id="fTitle"></h2>
         <p class="meta" id="fMeta"></p>
         <p class="syn" id="fSyn"></p>
+        <div id="fRateBox" hidden>
+          <p class="rating-label" id="fRateLabel"></p>
+          <div class="rating" id="fRating" role="group" aria-label="Note sur 10"></div>
+          <p class="rating-val" id="fRateVal" aria-live="polite"></p>
+        </div>
         <div class="actions">
           <button class="btn primary" id="fSeen" type="button"></button>
           <button class="btn" id="fNext" type="button"></button>
@@ -218,11 +256,13 @@ const FILMS=[
  {id:25,fr:"Le Garçon et le Héron",en:"The Boy and the Heron",y:2023,d:"Hayao Miyazaki",p:"https://upload.wikimedia.org/wikipedia/en/4/41/How_Do_You_Live_poster.jpg"}
 ];
 
-let seen={}, next={}, filter="all", picked=null;
+let seen={}, next={}, ratings={}, filter="all", picked=null;
 try{ seen=JSON.parse(localStorage.getItem("ghibli_seen")||"{}"); }catch(e){}
+try{ ratings=JSON.parse(localStorage.getItem("ghibli_ratings")||"{}"); }catch(e){}
 try{ next=JSON.parse(localStorage.getItem("ghibli_next")||"{}"); }catch(e){}
 // localStorage = cache local (affichage instantané + hors-ligne) ; Firebase = source partagée.
 function cacheSeen(){ try{localStorage.setItem("ghibli_seen",JSON.stringify(seen));}catch(e){} }
+function cacheRatings(){ try{localStorage.setItem("ghibli_ratings",JSON.stringify(ratings));}catch(e){} }
 function cacheNext(){ try{localStorage.setItem("ghibli_next",JSON.stringify(next));}catch(e){} }
 
 const $=id=>document.getElementById(id);
@@ -244,6 +284,11 @@ function startSync(){
     if(!s.exists){ migrate("seen",seen); return; }
     seen=onlyTrue(s.data); cacheSeen(); refresh(); setSync("☁ Synchronisé");
   },onErr).catch(onErr);
+  cloud.subscribe("ratings",s=>{
+    if(s.hasPendingWrites) return;
+    if(!s.exists){ migrate("ratings",ratings); return; }
+    ratings=s.data; cacheRatings(); refresh();
+  },onErr).catch(onErr);
   cloud.subscribe("next",s=>{
     if(s.hasPendingWrites) return;
     if(!s.exists){ migrate("next",next); return; }
@@ -255,8 +300,14 @@ function setSeen(id,v){
   if(v) seen[id]=true; else delete seen[id];
   cacheSeen();
   cloudCall(()=>cloud.setSeen(id,v));
+  if(!v&&ratings[id]) setRating(id,null); // plus vu : la note n'a plus de sens
   if(v&&next[id]) setNext(id,false); // un film vu quitte la liste « à regarder »
   else refresh();
+}
+function setRating(id,v){
+  if(v) ratings[id]=v; else delete ratings[id];
+  cacheRatings(); refresh();
+  cloudCall(()=>cloud.setRating(id,v));
 }
 function setNext(id,v){
   if(v) next[id]=true; else delete next[id];
@@ -265,6 +316,9 @@ function setNext(id,v){
 }
 // re-rend la liste + la fiche si elle est ouverte
 function refresh(){ render(); if(ficheId&&$("fiche").open) fillFiche(FILMS.find(f=>f.id===ficheId)); }
+// Décalage de teinte appliqué au Calcifer (orange, ~35°) pour la note n : 1 → bleu violacé (~275°), 10 → rouge (~357°),
+// en passant par violet et magenta (on monte, on ne traverse pas vert/jaune). Valeurs réglées à l'œil.
+const hueShift=n=>Math.round(240+(n-1)/9*90)+"deg";
 let dirFilter="", onlyList=false, ficheId=null;
 const unseenList=()=>FILMS.filter(f=>!seen[f.id]&&(!dirFilter||f.d===dirFilter)&&(!onlyList||next[f.id]));
 
@@ -283,14 +337,18 @@ function posterHTML(f){
 }
 
 function render(){
-  const list=FILMS.filter(f=>filter==="all"||(filter==="seen"?seen[f.id]:filter==="next"?next[f.id]:!seen[f.id]));
-  $("rows").innerHTML=list.map(f=>`
-    <tr class="${picked===f.id?"picked":""}">
+  let list=FILMS.filter(f=>filter==="all"||(filter==="seen"?seen[f.id]:filter==="next"?next[f.id]:filter==="rank"?ratings[f.id]:!seen[f.id]));
+  if(filter==="rank") list.sort((a,b)=>ratings[b.id]-ratings[a.id]||a.y-b.y); // meilleure note d'abord, égalité : le plus ancien
+  const emptyMsg={rank:"Aucune note pour l'instant : ouvre la fiche d'un film vu pour le noter.",next:"Ta liste est vide : ajoute des films avec ☆.",seen:"Tu n'as encore marqué aucun film comme vu."}[filter];
+  $("empty").hidden=!(emptyMsg&&!list.length); $("empty").textContent=emptyMsg||"";
+  $("rows").innerHTML=list.map((f,i)=>`
+    <tr class="${picked===f.id?"picked":""}" data-id="${f.id}">
       <td class="p">${posterHTML(f)}</td>
-      <td class="t"><button class="title-btn" data-fiche="${f.id}" type="button">${f.fr}</button><small>${f.en}</small></td>
+      <td class="t"><button class="title-btn" data-fiche="${f.id}" type="button">${filter==="rank"?"#"+(i+1)+" · ":""}${f.fr}</button><small>${f.en}</small></td>
       <td class="y">${f.y}</td>
       <td class="d" data-y="${f.y}">${f.d}</td>
       <td class="s"><button class="status ${seen[f.id]?"seen":"unseen"}" data-seen="${f.id}" type="button">${seen[f.id]?"Vu":"Pas vu"}</button></td>
+      <td class="r">${ratings[f.id]?`<span class="note"><span class="calc on" style="--hr:${hueShift(ratings[f.id])}" aria-hidden="true"></span>${ratings[f.id]}<small>/10</small></span>`:""}</td>
       <td class="n">${seen[f.id]?"":`<button class="pin${next[f.id]?" on":""}" data-next="${f.id}" aria-pressed="${!!next[f.id]}" aria-label="${next[f.id]?"Retirer de":"Ajouter à"} ma liste : ${f.fr}" type="button">${next[f.id]?"★":"☆"}</button>`}</td>
     </tr>`).join("");
   const n=FILMS.filter(f=>seen[f.id]).length, left=FILMS.length-n;
@@ -318,13 +376,29 @@ function fillFiche(f){
   $("fTitle").textContent=f.fr;
   $("fMeta").textContent=`${f.en} — ${f.y}, ${f.d}${info.m?", "+Math.floor(info.m/60)+" h "+String(info.m%60).padStart(2,"0"):""}`;
   $("fSyn").textContent=info.s||"";
+  $("fRateBox").hidden=!seen[f.id];
+  const r=ratings[f.id]||0;
+  $("fRateLabel").textContent=r?"Ta note":"Tu l'as vu ! Quelle note lui donnes-tu ?";
+  $("fRating").innerHTML=Array.from({length:10},(_,k)=>`<button type="button" data-rate="${k+1}" aria-pressed="${r===k+1}" aria-label="${k+1} sur 10"><span class="calc${k<r?" on":""}" style="--hr:${hueShift(k+1)}"></span></button>`).join("");
+  $("fRateVal").textContent=r?`${r} / 10`:"";
   $("fSeen").textContent=seen[f.id]?"Marquer pas vu":"Marquer comme vu";
   $("fSeen").dataset.seen=f.id;
   $("fNext").hidden=!!seen[f.id];
   $("fNext").textContent=next[f.id]?"★ Dans ma liste":"☆ Ajouter à ma liste";
   $("fNext").dataset.next=f.id;
 }
-function openFiche(id){ ficheId=id; fillFiche(FILMS.find(f=>f.id===id)); $("fiche").showModal(); }
+function openFiche(id){ ficheId=id; fillFiche(FILMS.find(f=>f.id===id)); if(!$("fiche").open) $("fiche").showModal(); }
+// Aperçu au survol / focus clavier : les Calcifer s'allument jusqu'à celui visé, puis reviennent à la note réelle.
+function paintRating(n){
+  document.querySelectorAll("#fRating .calc").forEach((c,k)=>c.classList.toggle("on",k<n));
+  $("fRateVal").textContent=n?`${n} / 10`:"";
+}
+const rateTarget=e=>{ const b=e.target.closest("[data-rate]"); return b?+b.dataset.rate:0; };
+const restoreRating=()=>paintRating(ratings[ficheId]||0);
+$("fRating").addEventListener("mouseover",e=>{ const n=rateTarget(e); if(n) paintRating(n); });
+$("fRating").addEventListener("focusin",e=>{ const n=rateTarget(e); if(n) paintRating(n); });
+$("fRating").addEventListener("mouseleave",restoreRating);
+$("fRating").addEventListener("focusout",restoreRating);
 $("fClose").addEventListener("click",()=>$("fiche").close());
 $("fiche").addEventListener("click",e=>{ if(e.target===$("fiche")) $("fiche").close(); }); // clic sur le fond
 
@@ -349,7 +423,7 @@ $("dir").addEventListener("change",e=>{dirFilter=e.target.value;render();});
 $("drawBtn").addEventListener("click",draw);
 $("rAgain").addEventListener("click",draw);
 $("onlyList").addEventListener("change",e=>{onlyList=e.target.checked;render();});
-$("rSeen").addEventListener("click",()=>{ if(picked) setSeen(picked,true); });
+$("rSeen").addEventListener("click",()=>{ if(picked){ setSeen(picked,true); openFiche(picked); } });
 
 document.querySelector(".tabs").addEventListener("click",e=>{
   const b=e.target.closest(".tab"); if(!b) return;
@@ -360,15 +434,24 @@ document.querySelector(".tabs").addEventListener("click",e=>{
 document.body.addEventListener("click",e=>{
   const t=e.target.closest("[data-fiche]");
   if(t){ openFiche(+t.dataset.fiche); return; }
+  const rt=e.target.closest("[data-rate]");
+  if(rt&&ficheId){ const v=+rt.dataset.rate; setRating(ficheId,ratings[ficheId]===v?null:v); return; } // re-clic = retirer la note
   const n=e.target.closest("[data-next]");
   if(n){ const id=+n.dataset.next; setNext(id,!next[id]); return; }
   const s=e.target.closest("[data-seen]");
-  if(s){ const id=+s.dataset.seen; setSeen(id,!seen[id]); return; }
+  if(s){
+    const id=+s.dataset.seen;
+    if(seen[id]) setSeen(id,false);
+    else { setSeen(id,true); openFiche(id); } // marqué vu : on propose directement de noter
+    return;
+  }
+  const row=e.target.closest("tr[data-id]");
+  if(row){ openFiche(+row.dataset.id); }
 });
 $("reset").addEventListener("click",()=>{
-  if(confirm("Remettre tous les films à « Pas vu », et vider ta liste ?")){
-    seen={}; next={}; picked=null; $("result").hidden=true;
-    try{localStorage.removeItem("ghibli_seen");localStorage.removeItem("ghibli_next");}catch(e){}
+  if(confirm("Remettre tous les films à « Pas vu », et vider ta liste et tes notes ?")){
+    seen={}; next={}; ratings={}; picked=null; $("result").hidden=true;
+    try{localStorage.removeItem("ghibli_seen");localStorage.removeItem("ghibli_next");localStorage.removeItem("ghibli_ratings");}catch(e){}
     cloudCall(()=>cloud.resetAll());
     render();
   }

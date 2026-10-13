@@ -18,6 +18,7 @@ automatiquement dans Firebase.
 ## Données (collection `ghibli`)
 
 - `ghibli/seen` : `{ seen: { "<idFilm>": true|false } }`
+- `ghibli/ratings` : `{ ratings: { "<idFilm>": 1..10 } }` (notes sur 10, onglet Classement)
 - `ghibli/next` : `{ next: { "<idFilm>": true|false } }` (liste « à regarder ensuite »)
 
 ## Lancer en local
