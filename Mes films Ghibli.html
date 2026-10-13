@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mes films Ghibli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e8f2f1; --panel:#ffffff; --ink:#1e3a34; --muted:#5d7a73; --line:#cfe0dd;
+  --accent:#f0b43c; --accent-ink:#3b2a00; --seen:#3f8f6b; --seen-bg:#dff2e8; --unseen-bg:#f4ecd6; --unseen:#8a6a1c;
+  --shadow:0 1px 0 rgba(30,58,52,.06);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1e1f; --panel:#172b2c; --ink:#e4f0ec; --muted:#8fb0a8; --line:#264244;
+    --seen:#6fd0a0; --seen-bg:#1c3a30; --unseen-bg:#3a3118; --unseen:#e6c166; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1e1f; --panel:#172b2c; --ink:#e4f0ec; --muted:#8fb0a8; --line:#264244;
+  --seen:#6fd0a0; --seen-bg:#1c3a30; --unseen-bg:#3a3118; --unseen:#e6c166; --shadow:none;
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Zen Maru Gothic",ui-rounded,"Hiragino Maru Gothic ProN",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 48px}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:900;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 22px}
+
+/* tirage */
+.draw{background:var(--panel);border:2px solid var(--ink);border-radius:20px;padding:18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:26px}
+.draw-main{flex:1 1 220px;min-width:0}
+.btn-draw{font:inherit;font-weight:900;font-size:1.15rem;background:var(--accent);color:var(--accent-ink);border:2px solid var(--ink);border-radius:999px;padding:14px 26px;cursor:pointer;box-shadow:0 4px 0 var(--ink);transition:transform .08s, box-shadow .08s}
+.btn-draw:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn-draw:disabled{opacity:.5;cursor:not-allowed}
+.count{margin:10px 0 0;color:var(--muted);font-size:.95rem}
+.result{display:flex;gap:14px;align-items:center;flex:2 1 300px;min-width:0}
+.result[hidden]{display:none}
+.result .poster{width:78px;height:110px;flex:none}
+.result h2{margin:0;font-size:1.4rem;line-height:1.2;overflow-wrap:anywhere}
+.result .meta{color:var(--muted);margin:2px 0 10px;font-size:.92rem}
+.result .actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;font-size:.92rem;background:transparent;color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.btn.primary{background:var(--seen);border-color:var(--seen);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0b1c17}
+.rolling h2{opacity:.55}
+
+.dirsel{display:block;margin-top:12px}
+.dirsel label{display:block;font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:4px}
+.dirsel select{font:inherit;font-weight:500;width:100%;max-width:320px;color:var(--ink);background:var(--bg);border:2px solid var(--ink);border-radius:12px;padding:8px 10px}
+
+/* barre */
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:700;font-size:.9rem;background:transparent;color:var(--muted);border:2px solid var(--line);border-radius:999px;padding:5px 14px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.progress{margin-left:auto;font-size:.9rem;color:var(--muted)}
+.meter{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:14px}
+.meter i{display:block;height:100%;background:var(--seen);width:0;transition:width .3s}
+
+/* tableau */
+.tablewrap{overflow-x:auto;background:var(--panel);border:2px solid var(--ink);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th{text-align:left;font-size:.85rem;color:var(--muted);font-weight:700;padding:10px 12px;border-bottom:2px solid var(--ink);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr.picked td{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+td.t{font-weight:700}
+td.t small{display:block;font-weight:400;color:var(--muted)}
+td.y{white-space:nowrap;color:var(--muted)}
+.poster{width:44px;height:62px;border-radius:6px;border:2px solid var(--ink);overflow:hidden;position:relative;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;background-size:cover;background-position:center;padding:0;font:inherit}
+.poster span{font-size:.62rem;font-weight:900;color:#fff;text-align:center;line-height:1.05;padding:3px 2px;text-shadow:0 1px 2px rgba(0,0,0,.55);width:100%;background:linear-gradient(transparent,rgba(0,0,0,.45))}
+.poster.img span{display:none}
+.status{font:inherit;font-weight:700;font-size:.88rem;border-radius:999px;padding:5px 12px;cursor:pointer;border:2px solid transparent;white-space:nowrap}
+.status.seen{background:var(--seen-bg);color:var(--seen);border-color:var(--seen)}
+.status.unseen{background:var(--unseen-bg);color:var(--unseen);border-color:var(--unseen)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.foot{margin-top:14px;color:var(--muted);font-size:.85rem}
+.foot button{font:inherit;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mes films Ghibli</h1>
+  <p class="sub">Coche ceux que tu as vus, puis laisse le hasard choisir le prochain.</p>
+
+  <section class="draw" aria-live="polite">
+    <div class="draw-main">
+      <button class="btn-draw" id="drawBtn" type="button">Tirer un film au hasard</button>
+      <div class="dirsel">
+        <label for="dir">Réalisateur du tirage</label>
+        <select id="dir"></select>
+      </div>
+      <p class="count" id="count"></p>
+    </div>
+    <div class="result" id="result" hidden>
+      <button class="poster" id="rPoster" type="button" aria-label="Changer la couverture"><span></span></button>
+      <div>
+        <h2 id="rTitle"></h2>
+        <p class="meta" id="rMeta"></p>
+        <div class="actions">
+          <button class="btn primary" id="rSeen" type="button">Marquer comme vu</button>
+          <button class="btn" id="rAgain" type="button">Un autre</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bar">
+    <div class="tabs" role="group" aria-label="Filtrer">
+      <button class="tab" data-f="all" aria-pressed="true" type="button">Tous</button>
+      <button class="tab" data-f="unseen" aria-pressed="false" type="button">Pas vus</button>
+      <button class="tab" data-f="seen" aria-pressed="false" type="button">Vus</button>
+    </div>
+    <div class="progress" id="progress"></div>
+  </div>
+  <div class="meter"><i id="meter"></i></div>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Couverture</th><th>Film</th><th>Année</th><th>Réalisateur</th><th>Statut</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="foot">Astuce : touche une vignette pour y mettre ta propre image de couverture. Tout est enregistré sur cet appareil. <button id="reset" type="button">Tout réinitialiser</button></p>
+  <input type="file" id="file" accept="image/*" hidden>
+</div>
+
+<script>
+const FILMS=[
+ {id:1,fr:"Nausicaä de la vallée du vent",en:"Nausicaä of the Valley of the Wind",y:1984,d:"Hayao Miyazaki"},
+ {id:2,fr:"Le Château dans le ciel",en:"Castle in the Sky",y:1986,d:"Hayao Miyazaki"},
+ {id:3,fr:"Le Tombeau des lucioles",en:"Grave of the Fireflies",y:1988,d:"Isao Takahata"},
+ {id:4,fr:"Mon voisin Totoro",en:"My Neighbor Totoro",y:1988,d:"Hayao Miyazaki"},
+ {id:5,fr:"Kiki la petite sorcière",en:"Kiki's Delivery Service",y:1989,d:"Hayao Miyazaki"},
+ {id:6,fr:"Souvenirs goutte à goutte",en:"Only Yesterday",y:1991,d:"Isao Takahata"},
+ {id:7,fr:"Porco Rosso",en:"Porco Rosso",y:1992,d:"Hayao Miyazaki"},
+ {id:8,fr:"Je peux entendre l'océan",en:"Ocean Waves",y:1993,d:"Tomomi Mochizuki"},
+ {id:9,fr:"Pompoko",en:"Pom Poko",y:1994,d:"Isao Takahata"},
+ {id:10,fr:"Si tu tends l'oreille",en:"Whisper of the Heart",y:1995,d:"Yoshifumi Kondō"},
+ {id:11,fr:"Princesse Mononoké",en:"Princess Mononoke",y:1997,d:"Hayao Miyazaki"},
+ {id:12,fr:"Mes voisins les Yamada",en:"My Neighbors the Yamadas",y:1999,d:"Isao Takahata"},
+ {id:13,fr:"Le Voyage de Chihiro",en:"Spirited Away",y:2001,d:"Hayao Miyazaki"},
+ {id:14,fr:"Le Royaume des chats",en:"The Cat Returns",y:2002,d:"Hiroyuki Morita"},
+ {id:15,fr:"Le Château ambulant",en:"Howl's Moving Castle",y:2004,d:"Hayao Miyazaki"},
+ {id:16,fr:"Les Contes de Terremer",en:"Tales from Earthsea",y:2006,d:"Gorō Miyazaki"},
+ {id:17,fr:"Ponyo sur la falaise",en:"Ponyo",y:2008,d:"Hayao Miyazaki"},
+ {id:18,fr:"Arrietty, le petit monde des chapardeurs",en:"Arrietty",y:2010,d:"Hiromasa Yonebayashi"},
+ {id:19,fr:"La Colline aux coquelicots",en:"From Up on Poppy Hill",y:2011,d:"Gorō Miyazaki"},
+ {id:20,fr:"Le Vent se lève",en:"The Wind Rises",y:2013,d:"Hayao Miyazaki"},
+ {id:21,fr:"Le Conte de la princesse Kaguya",en:"The Tale of the Princess Kaguya",y:2013,d:"Isao Takahata"},
+ {id:22,fr:"Souvenirs de Marnie",en:"When Marnie Was There",y:2014,d:"Hiromasa Yonebayashi"},
+ {id:23,fr:"La Tortue rouge",en:"The Red Turtle",y:2016,d:"Michaël Dudok de Wit"},
+ {id:24,fr:"Aya et la sorcière",en:"Earwig and the Witch",y:2020,d:"Gorō Miyazaki"},
+ {id:25,fr:"Le Garçon et le Héron",en:"The Boy and the Heron",y:2023,d:"Hayao Miyazaki"}
+];
+
+let seen={}, covers={}, filter="all", picked=null, pendingCover=null;
+try{ seen=JSON.parse(localStorage.getItem("ghibli_seen")||"{}"); }catch(e){}
+try{ covers=JSON.parse(localStorage.getItem("ghibli_covers")||"{}"); }catch(e){}
+function save(){ try{localStorage.setItem("ghibli_seen",JSON.stringify(seen));}catch(e){} }
+function saveCovers(){ try{localStorage.setItem("ghibli_covers",JSON.stringify(covers));}catch(e){ alert("Image trop lourde : impossible de l'enregistrer."); } }
+
+const $=id=>document.getElementById(id);
+let dirFilter="";
+const unseenList=()=>FILMS.filter(f=>!seen[f.id]&&(!dirFilter||f.d===dirFilter));
+
+function posterStyle(f){
+  if(covers[f.id]) return {img:true, css:`background-image:url(${covers[f.id]})`};
+  const h=(f.id*47)%360;
+  return {img:false, css:`background-image:linear-gradient(160deg,hsl(${h} 45% 52%),hsl(${(h+40)%360} 50% 32%))`};
+}
+function posterHTML(f){
+  const p=posterStyle(f);
+  return `<button class="poster${p.img?" img":""}" style="${p.css}" data-cover="${f.id}" aria-label="Couverture de ${f.fr} : changer l'image" type="button"><span>${f.fr.split(" ").slice(0,3).join(" ")}</span></button>`;
+}
+
+function render(){
+  const list=FILMS.filter(f=>filter==="all"||(filter==="seen"?seen[f.id]:!seen[f.id]));
+  $("rows").innerHTML=list.map(f=>`
+    <tr class="${picked===f.id?"picked":""}">
+      <td>${posterHTML(f)}</td>
+      <td class="t">${f.fr}<small>${f.en}</small></td>
+      <td class="y">${f.y}</td>
+      <td>${f.d}</td>
+      <td><button class="status ${seen[f.id]?"seen":"unseen"}" data-seen="${f.id}" type="button">${seen[f.id]?"Vu":"Pas vu"}</button></td>
+    </tr>`).join("");
+  const n=FILMS.filter(f=>seen[f.id]).length, left=FILMS.length-n;
+  $("progress").textContent=`${n} vus sur ${FILMS.length}`;
+  $("meter").style.width=(n/FILMS.length*100)+"%";
+  const pool=unseenList().length;
+  $("count").textContent=!left?"Tu les as tous vus !":!pool?`Tu as déjà vu tous les films de ${dirFilter}.`:`${pool} film${pool>1?"s":""} en attente${dirFilter?" de "+dirFilter:""}`;
+  $("drawBtn").disabled=!pool;
+  if(picked && seen[picked]) { $("rSeen").hidden=true; } else { $("rSeen").hidden=false; }
+}
+
+function showResult(f,rolling){
+  const r=$("result"); r.hidden=false; r.classList.toggle("rolling",!!rolling);
+  const p=posterStyle(f), el=$("rPoster");
+  el.className="poster"+(p.img?" img":""); el.style.cssText=p.css; el.dataset.cover=f.id;
+  el.firstElementChild.textContent=f.fr.split(" ").slice(0,3).join(" ");
+  $("rTitle").textContent=f.fr;
+  $("rMeta").textContent=`${f.en} — ${f.y}, ${f.d}`;
+}
+
+let timer=null;
+function draw(){
+  const pool=unseenList(); if(!pool.length||timer) return;
+  const choice=pool[Math.floor(Math.random()*pool.length)];
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let i=0, steps=reduce?0:12;
+  $("drawBtn").disabled=true;
+  const tick=()=>{
+    if(i<steps){ showResult(pool[Math.floor(Math.random()*pool.length)],true); i++; timer=setTimeout(tick,70+i*12); }
+    else { timer=null; picked=choice.id; showResult(choice,false); render();
+      const row=document.querySelector("tr.picked"); if(row&&filter!=="seen") row.scrollIntoView({block:"nearest",behavior:reduce?"auto":"smooth"}); }
+  };
+  tick();
+}
+
+const dirs=[...new Set(FILMS.map(f=>f.d))].sort((a,b)=>FILMS.filter(f=>f.d===b).length-FILMS.filter(f=>f.d===a).length||a.localeCompare(b));
+$("dir").innerHTML='<option value="">Tous les réalisateurs</option>'+dirs.map(d=>`<option value="${d}">${d} (${FILMS.filter(f=>f.d===d).length})</option>`).join("");
+$("dir").addEventListener("change",e=>{dirFilter=e.target.value;render();});
+$("drawBtn").addEventListener("click",draw);
+$("rAgain").addEventListener("click",draw);
+$("rSeen").addEventListener("click",()=>{ if(picked){ seen[picked]=true; save(); render(); } });
+
+document.querySelector(".tabs").addEventListener("click",e=>{
+  const b=e.target.closest(".tab"); if(!b) return;
+  filter=b.dataset.f;
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-pressed",t===b));
+  render();
+});
+document.body.addEventListener("click",e=>{
+  const s=e.target.closest("[data-seen]");
+  if(s){ const id=+s.dataset.seen; seen[id]=!seen[id]; if(!seen[id]) delete seen[id]; save(); render(); return; }
+  const c=e.target.closest("[data-cover]");
+  if(c){ pendingCover=+c.dataset.cover; $("file").value=""; $("file").click(); }
+});
+$("file").addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file||!pendingCover) return;
+  const img=new Image(), url=URL.createObjectURL(file), id=pendingCover;
+  img.onload=()=>{
+    const w=240, h=Math.round(w*1.45), cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+    const ctx=cv.getContext("2d"), s=Math.max(w/img.width,h/img.height), dw=img.width*s, dh=img.height*s;
+    ctx.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);
+    covers[id]=cv.toDataURL("image/jpeg",.8); URL.revokeObjectURL(url); saveCovers(); render();
+    if(picked===id) showResult(FILMS.find(f=>f.id===id),false);
+  };
+  img.src=url;
+});
+$("reset").addEventListener("click",()=>{
+  if(confirm("Remettre tous les films à « Pas vu » et supprimer les couvertures ?")){
+    seen={}; covers={}; picked=null; $("result").hidden=true;
+    try{localStorage.removeItem("ghibli_seen");localStorage.removeItem("ghibli_covers");}catch(e){}
+    render();
+  }
+});
+render();
+</script>
+</body>
+</html>
