@@ -1,7 +1,7 @@
 # Mes films Ghibli
 
-Liste des films Ghibli avec statut vu / pas vu, tirage au sort et couvertures
-personnalisées. Tout est sauvegardé dans **Firebase (Firestore)** et synchronisé
+Liste des films Ghibli avec statut vu / pas vu, tirage au sort, fiches détaillées et liste « à regarder ».
+Tout est sauvegardé dans **Firebase (Firestore)** et synchronisé
 entre appareils ; sans config Firebase, l'app tourne en mode local (navigateur).
 
 ## Brancher Firebase (une seule fois)
@@ -18,7 +18,7 @@ automatiquement dans Firebase.
 ## Données (collection `ghibli`)
 
 - `ghibli/seen` : `{ seen: { "<idFilm>": true|false } }`
-- `ghibli/covers` : `{ covers: { "<idFilm>": "data:image/jpeg;base64,…" } }`
+- `ghibli/next` : `{ next: { "<idFilm>": true|false } }` (liste « à regarder ensuite »)
 
 ## Lancer en local
 

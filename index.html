@@ -75,14 +75,48 @@ tr.picked td{background:color-mix(in srgb,var(--accent) 22%,transparent)}
 td.t{font-weight:700}
 td.t small{display:block;font-weight:400;color:var(--muted)}
 td.y{white-space:nowrap;color:var(--muted)}
-.poster{width:44px;height:62px;border-radius:6px;border:2px solid var(--ink);overflow:hidden;position:relative;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;background-size:cover;background-position:center;padding:0;font:inherit}
+.poster{width:44px;height:62px;border-radius:6px;border:2px solid var(--ink);overflow:hidden;position:relative;display:flex;align-items:flex-end;justify-content:center;background-size:cover;background-position:center;padding:0;font:inherit}
 .poster span{font-size:.62rem;font-weight:900;color:#fff;text-align:center;line-height:1.05;padding:3px 2px;text-shadow:0 1px 2px rgba(0,0,0,.55);width:100%;background:linear-gradient(transparent,rgba(0,0,0,.45))}
 .poster.img span{display:none}
 .status{font:inherit;font-weight:700;font-size:.88rem;border-radius:999px;padding:5px 12px;cursor:pointer;border:2px solid transparent;white-space:nowrap}
 .status.seen{background:var(--seen-bg);color:var(--seen);border-color:var(--seen)}
 .status.unseen{background:var(--unseen-bg);color:var(--unseen);border-color:var(--unseen)}
+.pin{font:inherit;font-size:1.25rem;line-height:1;background:none;border:0;cursor:pointer;color:var(--muted);padding:4px}
+.pin.on{color:var(--accent)}
+.title-btn{font:inherit;font-weight:700;text-align:left;background:none;border:0;padding:0;color:inherit;cursor:pointer}
+.title-btn:hover{text-decoration:underline}
+.onlylist{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.9rem;font-weight:700;color:var(--muted)}
+.onlylist input{width:18px;height:18px;accent-color:var(--seen)}
+dialog{border:2px solid var(--ink);border-radius:20px;padding:0;max-width:560px;width:calc(100% - 32px);background:var(--panel);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.fiche{display:flex;gap:16px;padding:20px;flex-wrap:wrap}
+.fiche .poster{width:120px;height:170px;flex:none}
+.fiche-body{flex:1 1 220px;min-width:0}
+.fiche h2{margin:0;font-size:1.35rem;line-height:1.2}
+.fiche .meta{color:var(--muted);margin:2px 0 10px;font-size:.92rem}
+.fiche p.syn{margin:0 0 14px}
+.fiche .actions{display:flex;gap:8px;flex-wrap:wrap}
+.fiche-close{margin-left:auto}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .foot{margin-top:14px;color:var(--muted);font-size:.85rem}
+@media (max-width:640px){
+  .tablewrap{overflow-x:visible}
+  table,tbody{display:block;min-width:0}
+  thead{display:none}
+  tr{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"p t t" "p d d" "p s n";gap:2px 12px;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
+  tr:last-child{border-bottom:0}
+  td{display:block;padding:0;border:0}
+  td.p{grid-area:p;align-self:start}
+  td.t{grid-area:t}
+  td.y{display:none}
+  td.d{grid-area:d;color:var(--muted);font-size:.9rem}
+  td.d::before{content:attr(data-y) " · "}
+  td.s{grid-area:s;margin-top:6px;justify-self:start}
+  td.n{grid-area:n;margin-top:6px}
+  tr.picked{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+  tr.picked td{background:none}
+  .poster{width:56px;height:80px}
+}
 .sync{font-weight:700}
 .sync.bad{color:#c0392b}
 .foot button{font:inherit;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0}
@@ -101,10 +135,11 @@ td.y{white-space:nowrap;color:var(--muted)}
         <label for="dir">Réalisateur du tirage</label>
         <select id="dir"></select>
       </div>
+      <label class="onlylist"><input type="checkbox" id="onlyList"> Tirer seulement dans ma liste ★</label>
       <p class="count" id="count"></p>
     </div>
     <div class="result" id="result" hidden>
-      <button class="poster" id="rPoster" type="button" aria-label="Changer la couverture"><span></span></button>
+      <div class="poster" id="rPoster" role="img"><span></span></div>
       <div>
         <h2 id="rTitle"></h2>
         <p class="meta" id="rMeta"></p>
@@ -121,6 +156,7 @@ td.y{white-space:nowrap;color:var(--muted)}
       <button class="tab" data-f="all" aria-pressed="true" type="button">Tous</button>
       <button class="tab" data-f="unseen" aria-pressed="false" type="button">Pas vus</button>
       <button class="tab" data-f="seen" aria-pressed="false" type="button">Vus</button>
+      <button class="tab" data-f="next" aria-pressed="false" type="button">Ma liste ★</button>
     </div>
     <div class="progress" id="progress"></div>
   </div>
@@ -128,16 +164,31 @@ td.y{white-space:nowrap;color:var(--muted)}
 
   <div class="tablewrap">
     <table>
-      <thead><tr><th>Couverture</th><th>Film</th><th>Année</th><th>Réalisateur</th><th>Statut</th></tr></thead>
+      <thead><tr><th>Affiche</th><th>Film</th><th>Année</th><th>Réalisateur</th><th>Statut</th><th>Ma liste</th></tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
-  <p class="foot">Astuce : touche une vignette pour y mettre ta propre image de couverture. Tes films vus et tes couvertures sont enregistrés dans Firebase. <span id="sync" class="sync"></span> <button id="reset" type="button">Tout réinitialiser</button></p>
-  <input type="file" id="file" accept="image/*" hidden>
+  <p class="foot">Tes films vus et ta liste sont enregistrés dans Firebase. <span id="sync" class="sync"></span> <button id="reset" type="button">Tout réinitialiser</button></p>
+  <dialog id="fiche" aria-labelledby="fTitle">
+    <div class="fiche">
+      <div class="poster" id="fPoster" role="img"><span></span></div>
+      <div class="fiche-body">
+        <h2 id="fTitle"></h2>
+        <p class="meta" id="fMeta"></p>
+        <p class="syn" id="fSyn"></p>
+        <div class="actions">
+          <button class="btn primary" id="fSeen" type="button"></button>
+          <button class="btn" id="fNext" type="button"></button>
+          <button class="btn fiche-close" id="fClose" type="button">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
 </div>
 
 <script type="module">
 import * as cloud from "./src/firebase.js";
+import { FILM_INFO } from "./src/filmInfo.js";
 
 const FILMS=[
  {id:1,fr:"Nausicaä de la vallée du vent",en:"Nausicaä of the Valley of the Wind",y:1984,d:"Hayao Miyazaki",p:"https://upload.wikimedia.org/wikipedia/en/b/bc/Nausicaaposter.jpg"},
@@ -167,19 +218,19 @@ const FILMS=[
  {id:25,fr:"Le Garçon et le Héron",en:"The Boy and the Heron",y:2023,d:"Hayao Miyazaki",p:"https://upload.wikimedia.org/wikipedia/en/4/41/How_Do_You_Live_poster.jpg"}
 ];
 
-let seen={}, covers={}, filter="all", picked=null, pendingCover=null;
+let seen={}, next={}, filter="all", picked=null;
 try{ seen=JSON.parse(localStorage.getItem("ghibli_seen")||"{}"); }catch(e){}
-try{ covers=JSON.parse(localStorage.getItem("ghibli_covers")||"{}"); }catch(e){}
+try{ next=JSON.parse(localStorage.getItem("ghibli_next")||"{}"); }catch(e){}
 // localStorage = cache local (affichage instantané + hors-ligne) ; Firebase = source partagée.
 function cacheSeen(){ try{localStorage.setItem("ghibli_seen",JSON.stringify(seen));}catch(e){} }
-function cacheCovers(){ try{localStorage.setItem("ghibli_covers",JSON.stringify(covers));}catch(e){ alert("Image trop lourde : impossible de l'enregistrer."); } }
+function cacheNext(){ try{localStorage.setItem("ghibli_next",JSON.stringify(next));}catch(e){} }
 
 const $=id=>document.getElementById(id);
 
 /* ---------- synchronisation Firebase ---------- */
 const online=cloud.isConfigured();
 function setSync(txt,bad){ const el=$("sync"); el.textContent=txt; el.classList.toggle("bad",!!bad); }
-const onlySeen=o=>Object.fromEntries(Object.entries(o||{}).filter(([,v])=>v)); // ne garde que les films vus
+const onlyTrue=o=>Object.fromEntries(Object.entries(o||{}).filter(([,v])=>v)); // ne garde que les films vus
 function cloudCall(fn){ if(!online) return; fn().then(()=>setSync("☁ Synchronisé")).catch(e=>{console.error(e);setSync("⚠ Échec de la synchronisation",true);}); }
 
 function startSync(){
@@ -191,52 +242,62 @@ function startSync(){
   cloud.subscribe("seen",s=>{
     if(s.hasPendingWrites) return;
     if(!s.exists){ migrate("seen",seen); return; }
-    seen=onlySeen(s.data); cacheSeen(); render(); setSync("☁ Synchronisé");
+    seen=onlyTrue(s.data); cacheSeen(); refresh(); setSync("☁ Synchronisé");
   },onErr).catch(onErr);
-  cloud.subscribe("covers",s=>{
+  cloud.subscribe("next",s=>{
     if(s.hasPendingWrites) return;
-    if(!s.exists){ migrate("covers",covers); return; }
-    covers=s.data; cacheCovers(); render(); if(picked) showResult(FILMS.find(f=>f.id===picked),false);
+    if(!s.exists){ migrate("next",next); return; }
+    next=onlyTrue(s.data); cacheNext(); refresh();
   },onErr).catch(onErr);
 }
 
 function setSeen(id,v){
   if(v) seen[id]=true; else delete seen[id];
-  cacheSeen(); render();
+  cacheSeen();
   cloudCall(()=>cloud.setSeen(id,v));
+  if(v&&next[id]) setNext(id,false); // un film vu quitte la liste « à regarder »
+  else refresh();
 }
-let dirFilter="";
-const unseenList=()=>FILMS.filter(f=>!seen[f.id]&&(!dirFilter||f.d===dirFilter));
+function setNext(id,v){
+  if(v) next[id]=true; else delete next[id];
+  cacheNext(); refresh();
+  cloudCall(()=>cloud.setNext(id,v));
+}
+// re-rend la liste + la fiche si elle est ouverte
+function refresh(){ render(); if(ficheId&&$("fiche").open) fillFiche(FILMS.find(f=>f.id===ficheId)); }
+let dirFilter="", onlyList=false, ficheId=null;
+const unseenList=()=>FILMS.filter(f=>!seen[f.id]&&(!dirFilter||f.d===dirFilter)&&(!onlyList||next[f.id]));
 
 function posterStyle(f){
-  // priorité : couverture perso (Firebase) > affiche officielle (f.p) > dégradé.
+  // affiche officielle (f.p), sinon dégradé.
   // Le dégradé reste dessous : si l'affiche ne charge pas, il s'affiche à la place.
   const h=(f.id*47)%360;
   const grad=`linear-gradient(160deg,hsl(${h} 45% 52%),hsl(${(h+40)%360} 50% 32%))`;
-  const src=covers[f.id]||f.p;
+  const src=f.p;
   if(src) return {img:true, css:`background-image:url('${src}'),${grad}`};
   return {img:false, css:`background-image:${grad}`};
 }
 function posterHTML(f){
   const p=posterStyle(f);
-  return `<button class="poster${p.img?" img":""}" style="${p.css}" data-cover="${f.id}" aria-label="Couverture de ${f.fr} : changer l'image" type="button"><span>${f.fr.split(" ").slice(0,3).join(" ")}</span></button>`;
+  return `<div class="poster${p.img?" img":""}" style="${p.css}" role="img" aria-label="Affiche de ${f.fr}"><span>${f.fr.split(" ").slice(0,3).join(" ")}</span></div>`;
 }
 
 function render(){
-  const list=FILMS.filter(f=>filter==="all"||(filter==="seen"?seen[f.id]:!seen[f.id]));
+  const list=FILMS.filter(f=>filter==="all"||(filter==="seen"?seen[f.id]:filter==="next"?next[f.id]:!seen[f.id]));
   $("rows").innerHTML=list.map(f=>`
     <tr class="${picked===f.id?"picked":""}">
-      <td>${posterHTML(f)}</td>
-      <td class="t">${f.fr}<small>${f.en}</small></td>
+      <td class="p">${posterHTML(f)}</td>
+      <td class="t"><button class="title-btn" data-fiche="${f.id}" type="button">${f.fr}</button><small>${f.en}</small></td>
       <td class="y">${f.y}</td>
-      <td>${f.d}</td>
-      <td><button class="status ${seen[f.id]?"seen":"unseen"}" data-seen="${f.id}" type="button">${seen[f.id]?"Vu":"Pas vu"}</button></td>
+      <td class="d" data-y="${f.y}">${f.d}</td>
+      <td class="s"><button class="status ${seen[f.id]?"seen":"unseen"}" data-seen="${f.id}" type="button">${seen[f.id]?"Vu":"Pas vu"}</button></td>
+      <td class="n">${seen[f.id]?"":`<button class="pin${next[f.id]?" on":""}" data-next="${f.id}" aria-pressed="${!!next[f.id]}" aria-label="${next[f.id]?"Retirer de":"Ajouter à"} ma liste : ${f.fr}" type="button">${next[f.id]?"★":"☆"}</button>`}</td>
     </tr>`).join("");
   const n=FILMS.filter(f=>seen[f.id]).length, left=FILMS.length-n;
   $("progress").textContent=`${n} vus sur ${FILMS.length}`;
   $("meter").style.width=(n/FILMS.length*100)+"%";
   const pool=unseenList().length;
-  $("count").textContent=!left?"Tu les as tous vus !":!pool?`Tu as déjà vu tous les films de ${dirFilter}.`:`${pool} film${pool>1?"s":""} en attente${dirFilter?" de "+dirFilter:""}`;
+  $("count").textContent=!left?"Tu les as tous vus !":!pool?(onlyList?"Ta liste est vide pour ce tirage : ajoute des films avec ☆.":`Tu as déjà vu tous les films de ${dirFilter}.`):`${pool} film${pool>1?"s":""} ${onlyList?"dans ta liste":"en attente"}${dirFilter?" de "+dirFilter:""}`;
   $("drawBtn").disabled=!pool;
   if(picked && seen[picked]) { $("rSeen").hidden=true; } else { $("rSeen").hidden=false; }
 }
@@ -244,11 +305,28 @@ function render(){
 function showResult(f,rolling){
   const r=$("result"); r.hidden=false; r.classList.toggle("rolling",!!rolling);
   const p=posterStyle(f), el=$("rPoster");
-  el.className="poster"+(p.img?" img":""); el.style.cssText=p.css; el.dataset.cover=f.id;
+  el.className="poster"+(p.img?" img":""); el.style.cssText=p.css; el.setAttribute("aria-label","Affiche de "+f.fr);
   el.firstElementChild.textContent=f.fr.split(" ").slice(0,3).join(" ");
   $("rTitle").textContent=f.fr;
   $("rMeta").textContent=`${f.en} — ${f.y}, ${f.d}`;
 }
+
+function fillFiche(f){
+  const p=posterStyle(f), el=$("fPoster"), info=FILM_INFO[f.id]||{};
+  el.className="poster"+(p.img?" img":""); el.style.cssText=p.css; el.setAttribute("aria-label","Affiche de "+f.fr);
+  el.firstElementChild.textContent=f.fr.split(" ").slice(0,3).join(" ");
+  $("fTitle").textContent=f.fr;
+  $("fMeta").textContent=`${f.en} — ${f.y}, ${f.d}${info.m?", "+Math.floor(info.m/60)+" h "+String(info.m%60).padStart(2,"0"):""}`;
+  $("fSyn").textContent=info.s||"";
+  $("fSeen").textContent=seen[f.id]?"Marquer pas vu":"Marquer comme vu";
+  $("fSeen").dataset.seen=f.id;
+  $("fNext").hidden=!!seen[f.id];
+  $("fNext").textContent=next[f.id]?"★ Dans ma liste":"☆ Ajouter à ma liste";
+  $("fNext").dataset.next=f.id;
+}
+function openFiche(id){ ficheId=id; fillFiche(FILMS.find(f=>f.id===id)); $("fiche").showModal(); }
+$("fClose").addEventListener("click",()=>$("fiche").close());
+$("fiche").addEventListener("click",e=>{ if(e.target===$("fiche")) $("fiche").close(); }); // clic sur le fond
 
 let timer=null;
 function draw(){
@@ -270,6 +348,7 @@ $("dir").innerHTML='<option value="">Tous les réalisateurs</option>'+dirs.map(d
 $("dir").addEventListener("change",e=>{dirFilter=e.target.value;render();});
 $("drawBtn").addEventListener("click",draw);
 $("rAgain").addEventListener("click",draw);
+$("onlyList").addEventListener("change",e=>{onlyList=e.target.checked;render();});
 $("rSeen").addEventListener("click",()=>{ if(picked) setSeen(picked,true); });
 
 document.querySelector(".tabs").addEventListener("click",e=>{
@@ -279,28 +358,17 @@ document.querySelector(".tabs").addEventListener("click",e=>{
   render();
 });
 document.body.addEventListener("click",e=>{
+  const t=e.target.closest("[data-fiche]");
+  if(t){ openFiche(+t.dataset.fiche); return; }
+  const n=e.target.closest("[data-next]");
+  if(n){ const id=+n.dataset.next; setNext(id,!next[id]); return; }
   const s=e.target.closest("[data-seen]");
   if(s){ const id=+s.dataset.seen; setSeen(id,!seen[id]); return; }
-  const c=e.target.closest("[data-cover]");
-  if(c){ pendingCover=+c.dataset.cover; $("file").value=""; $("file").click(); }
-});
-$("file").addEventListener("change",e=>{
-  const file=e.target.files[0]; if(!file||!pendingCover) return;
-  const img=new Image(), url=URL.createObjectURL(file), id=pendingCover;
-  img.onload=()=>{
-    const w=240, h=Math.round(w*1.45), cv=document.createElement("canvas"); cv.width=w; cv.height=h;
-    const ctx=cv.getContext("2d"), s=Math.max(w/img.width,h/img.height), dw=img.width*s, dh=img.height*s;
-    ctx.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);
-    covers[id]=cv.toDataURL("image/jpeg",.8); URL.revokeObjectURL(url); cacheCovers(); render();
-    cloudCall(()=>cloud.setCover(id,covers[id]));
-    if(picked===id) showResult(FILMS.find(f=>f.id===id),false);
-  };
-  img.src=url;
 });
 $("reset").addEventListener("click",()=>{
-  if(confirm("Remettre tous les films à « Pas vu » et supprimer les couvertures ?")){
-    seen={}; covers={}; picked=null; $("result").hidden=true;
-    try{localStorage.removeItem("ghibli_seen");localStorage.removeItem("ghibli_covers");}catch(e){}
+  if(confirm("Remettre tous les films à « Pas vu », et vider ta liste ?")){
+    seen={}; next={}; picked=null; $("result").hidden=true;
+    try{localStorage.removeItem("ghibli_seen");localStorage.removeItem("ghibli_next");}catch(e){}
     cloudCall(()=>cloud.resetAll());
     render();
   }

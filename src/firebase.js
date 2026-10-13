@@ -4,8 +4,7 @@
  *
  * Deux documents dans la collection `ghibli` :
  *   - ghibli/seen   : { seen:   { "<idFilm>": true|false } }
- *   - ghibli/covers : { covers: { "<idFilm>": "data:image/jpeg;base64,…" } }
- * Les couvertures sont à part car lourdes (limite Firestore : 1 Mo / document).
+ *   - ghibli/next   : { next:   { "<idFilm>": true|false } }  (à regarder ensuite)
  * Les écritures fusionnent (merge) : chaque clic ne touche que SON film, donc
  * deux appareils qui cochent des films différents ne s'écrasent pas.
  *
@@ -44,28 +43,28 @@ export async function setSeen(id, value) {
   await _fs.setDoc(r, { seen: { [id]: !!value } }, { merge: true });
 }
 
-/** Enregistre la couverture d'un film (data URL JPEG). */
-export async function setCover(id, dataUrl) {
-  const r = await ref("covers");
-  await _fs.setDoc(r, { covers: { [id]: dataUrl } }, { merge: true });
+/** Ajoute / retire un film de la liste « à regarder ensuite ». */
+export async function setNext(id, value) {
+  const r = await ref("next");
+  await _fs.setDoc(r, { next: { [id]: !!value } }, { merge: true });
 }
 
-/** Réinitialise tout (statuts + couvertures). */
+/** Réinitialise tout (statuts + liste). */
 export async function resetAll() {
   const rs = await ref("seen");
   await _fs.setDoc(rs, { seen: {} });
-  const rc = await ref("covers");
-  await _fs.setDoc(rc, { covers: {} });
+  const rn = await ref("next");
+  await _fs.setDoc(rn, { next: {} });
 }
 
-/** Envoie d'un coup une map locale (`name` = "seen" | "covers") : migration du localStorage. */
+/** Envoie d'un coup une map locale (`name` = "seen" | "next") : migration du localStorage. */
 export async function pushAll(name, map) {
   const r = await ref(name);
   await _fs.setDoc(r, { [name]: map }, { merge: true });
 }
 
 /**
- * Écoute en temps réel un document (`"seen"` ou `"covers"`).
+ * Écoute en temps réel un document (`"seen"` ou `"next"`).
  * `cb({ exists, data, hasPendingWrites })` — `data` est la map (ou null).
  * `hasPendingWrites` = true pour l'écho de NOTRE écriture pas encore confirmée.
  * `onError(err)` est appelé si la lecture échoue (règles, réseau…).
