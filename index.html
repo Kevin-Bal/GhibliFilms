@@ -140,31 +140,31 @@ td.y{white-space:nowrap;color:var(--muted)}
 import * as cloud from "./src/firebase.js";
 
 const FILMS=[
- {id:1,fr:"Nausicaä de la vallée du vent",en:"Nausicaä of the Valley of the Wind",y:1984,d:"Hayao Miyazaki"},
- {id:2,fr:"Le Château dans le ciel",en:"Castle in the Sky",y:1986,d:"Hayao Miyazaki"},
- {id:3,fr:"Le Tombeau des lucioles",en:"Grave of the Fireflies",y:1988,d:"Isao Takahata"},
- {id:4,fr:"Mon voisin Totoro",en:"My Neighbor Totoro",y:1988,d:"Hayao Miyazaki"},
- {id:5,fr:"Kiki la petite sorcière",en:"Kiki's Delivery Service",y:1989,d:"Hayao Miyazaki"},
- {id:6,fr:"Souvenirs goutte à goutte",en:"Only Yesterday",y:1991,d:"Isao Takahata"},
- {id:7,fr:"Porco Rosso",en:"Porco Rosso",y:1992,d:"Hayao Miyazaki"},
- {id:8,fr:"Je peux entendre l'océan",en:"Ocean Waves",y:1993,d:"Tomomi Mochizuki"},
- {id:9,fr:"Pompoko",en:"Pom Poko",y:1994,d:"Isao Takahata"},
- {id:10,fr:"Si tu tends l'oreille",en:"Whisper of the Heart",y:1995,d:"Yoshifumi Kondō"},
- {id:11,fr:"Princesse Mononoké",en:"Princess Mononoke",y:1997,d:"Hayao Miyazaki"},
- {id:12,fr:"Mes voisins les Yamada",en:"My Neighbors the Yamadas",y:1999,d:"Isao Takahata"},
- {id:13,fr:"Le Voyage de Chihiro",en:"Spirited Away",y:2001,d:"Hayao Miyazaki"},
- {id:14,fr:"Le Royaume des chats",en:"The Cat Returns",y:2002,d:"Hiroyuki Morita"},
- {id:15,fr:"Le Château ambulant",en:"Howl's Moving Castle",y:2004,d:"Hayao Miyazaki"},
- {id:16,fr:"Les Contes de Terremer",en:"Tales from Earthsea",y:2006,d:"Gorō Miyazaki"},
- {id:17,fr:"Ponyo sur la falaise",en:"Ponyo",y:2008,d:"Hayao Miyazaki"},
- {id:18,fr:"Arrietty, le petit monde des chapardeurs",en:"Arrietty",y:2010,d:"Hiromasa Yonebayashi"},
- {id:19,fr:"La Colline aux coquelicots",en:"From Up on Poppy Hill",y:2011,d:"Gorō Miyazaki"},
- {id:20,fr:"Le Vent se lève",en:"The Wind Rises",y:2013,d:"Hayao Miyazaki"},
- {id:21,fr:"Le Conte de la princesse Kaguya",en:"The Tale of the Princess Kaguya",y:2013,d:"Isao Takahata"},
- {id:22,fr:"Souvenirs de Marnie",en:"When Marnie Was There",y:2014,d:"Hiromasa Yonebayashi"},
- {id:23,fr:"La Tortue rouge",en:"The Red Turtle",y:2016,d:"Michaël Dudok de Wit"},
- {id:24,fr:"Aya et la sorcière",en:"Earwig and the Witch",y:2020,d:"Gorō Miyazaki"},
- {id:25,fr:"Le Garçon et le Héron",en:"The Boy and the Heron",y:2023,d:"Hayao Miyazaki"}
+ {id:1,fr:"Nausicaä de la vallée du vent",en:"Nausicaä of the Valley of the Wind",y:1984,d:"Hayao Miyazaki",p:"https://upload.wikimedia.org/wikipedia/en/b/bc/Nausicaaposter.jpg"},
+ {id:2,fr:"Le Château dans le ciel",en:"Castle in the Sky",y:1986,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/npOnzAbLh6VOIu3naU5QaEcTepo.jpg"},
+ {id:3,fr:"Le Tombeau des lucioles",en:"Grave of the Fireflies",y:1988,d:"Isao Takahata",p:"https://image.tmdb.org/t/p/w342/qG3RYlIVpTYclR9TYIsy8p7m7AT.jpg"},
+ {id:4,fr:"Mon voisin Totoro",en:"My Neighbor Totoro",y:1988,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/rtGDOeG9LzoerkDGZF9dnVeLppL.jpg"},
+ {id:5,fr:"Kiki la petite sorcière",en:"Kiki's Delivery Service",y:1989,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/7nO5DUMnGUuXrA4r2h6ESOKQRrx.jpg"},
+ {id:6,fr:"Souvenirs goutte à goutte",en:"Only Yesterday",y:1991,d:"Isao Takahata",p:"https://image.tmdb.org/t/p/w342/xjJU6rwzLX7Jk8HFQfVW6H5guMC.jpg"},
+ {id:7,fr:"Porco Rosso",en:"Porco Rosso",y:1992,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/byKAndF6KQSDpGxp1mTr23jPbYp.jpg"},
+ {id:8,fr:"Je peux entendre l'océan",en:"Ocean Waves",y:1993,d:"Tomomi Mochizuki",p:"https://upload.wikimedia.org/wikipedia/en/e/ea/Umigakikoeru_poster.jpg"},
+ {id:9,fr:"Pompoko",en:"Pom Poko",y:1994,d:"Isao Takahata",p:"https://image.tmdb.org/t/p/w342/kowo9E1e1JcWLXj9cCvAOFZcy5n.jpg"},
+ {id:10,fr:"Si tu tends l'oreille",en:"Whisper of the Heart",y:1995,d:"Yoshifumi Kondō",p:"https://image.tmdb.org/t/p/w342/5E3Hvbu0bg38ouYf6chGftVGqZ7.jpg"},
+ {id:11,fr:"Princesse Mononoké",en:"Princess Mononoke",y:1997,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/jHWmNr7m544fJ8eItsfNk8fs2Ed.jpg"},
+ {id:12,fr:"Mes voisins les Yamada",en:"My Neighbors the Yamadas",y:1999,d:"Isao Takahata",p:"https://image.tmdb.org/t/p/w342/wTGuHmMIBBgKakY80J1D52VvQKI.jpg"},
+ {id:13,fr:"Le Voyage de Chihiro",en:"Spirited Away",y:2001,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg"},
+ {id:14,fr:"Le Royaume des chats",en:"The Cat Returns",y:2002,d:"Hiroyuki Morita",p:"https://image.tmdb.org/t/p/w342/avPMO5cnaGHgLaNiAIhy33WoQLm.jpg"},
+ {id:15,fr:"Le Château ambulant",en:"Howl's Moving Castle",y:2004,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/TkTPELv4kC3u1lkloush8skOjE.jpg"},
+ {id:16,fr:"Les Contes de Terremer",en:"Tales from Earthsea",y:2006,d:"Gorō Miyazaki",p:"https://image.tmdb.org/t/p/w342/67yYwCPq7NbxSF6BIIXCMD34sY0.jpg"},
+ {id:17,fr:"Ponyo sur la falaise",en:"Ponyo",y:2008,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/mikKSEdk5kLhflWXbp4S5mmHsDo.jpg"},
+ {id:18,fr:"Arrietty, le petit monde des chapardeurs",en:"Arrietty",y:2010,d:"Hiromasa Yonebayashi",p:"https://image.tmdb.org/t/p/w342/oc2OB2KDmSRDMelKEAA1n4YRQL0.jpg"},
+ {id:19,fr:"La Colline aux coquelicots",en:"From Up on Poppy Hill",y:2011,d:"Gorō Miyazaki",p:"https://image.tmdb.org/t/p/w342/rRLYX4RZIyloHSJwvZKAhphAjiB.jpg"},
+ {id:20,fr:"Le Vent se lève",en:"The Wind Rises",y:2013,d:"Hayao Miyazaki",p:"https://image.tmdb.org/t/p/w342/jfwSexzlIzaOgxP9A8bTA6t8YYb.jpg"},
+ {id:21,fr:"Le Conte de la princesse Kaguya",en:"The Tale of the Princess Kaguya",y:2013,d:"Isao Takahata",p:"https://image.tmdb.org/t/p/w342/mWRQNlWXYYfd2z4FRm99MsgHgiA.jpg"},
+ {id:22,fr:"Souvenirs de Marnie",en:"When Marnie Was There",y:2014,d:"Hiromasa Yonebayashi",p:"https://image.tmdb.org/t/p/w342/vug1dvDI1tSa60Z8qjCuUE7ntkO.jpg"},
+ {id:23,fr:"La Tortue rouge",en:"The Red Turtle",y:2016,d:"Michaël Dudok de Wit",p:"https://image.tmdb.org/t/p/w342/wOBU3SLjQ9358Km9YWYasPZyebp.jpg"},
+ {id:24,fr:"Aya et la sorcière",en:"Earwig and the Witch",y:2020,d:"Gorō Miyazaki",p:"https://image.tmdb.org/t/p/w342/sJhFtY3eHuvvACaPpxpzdCLQqpQ.jpg"},
+ {id:25,fr:"Le Garçon et le Héron",en:"The Boy and the Heron",y:2023,d:"Hayao Miyazaki",p:"https://upload.wikimedia.org/wikipedia/en/4/41/How_Do_You_Live_poster.jpg"}
 ];
 
 let seen={}, covers={}, filter="all", picked=null, pendingCover=null;
@@ -209,9 +209,13 @@ let dirFilter="";
 const unseenList=()=>FILMS.filter(f=>!seen[f.id]&&(!dirFilter||f.d===dirFilter));
 
 function posterStyle(f){
-  if(covers[f.id]) return {img:true, css:`background-image:url(${covers[f.id]})`};
+  // priorité : couverture perso (Firebase) > affiche officielle (f.p) > dégradé.
+  // Le dégradé reste dessous : si l'affiche ne charge pas, il s'affiche à la place.
   const h=(f.id*47)%360;
-  return {img:false, css:`background-image:linear-gradient(160deg,hsl(${h} 45% 52%),hsl(${(h+40)%360} 50% 32%))`};
+  const grad=`linear-gradient(160deg,hsl(${h} 45% 52%),hsl(${(h+40)%360} 50% 32%))`;
+  const src=covers[f.id]||f.p;
+  if(src) return {img:true, css:`background-image:url('${src}'),${grad}`};
+  return {img:false, css:`background-image:${grad}`};
 }
 function posterHTML(f){
   const p=posterStyle(f);
