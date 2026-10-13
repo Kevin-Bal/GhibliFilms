@@ -122,18 +122,26 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 .note{font-weight:900;white-space:nowrap}
 .note small{font-weight:400;color:var(--muted)}
 .rating-label{font-size:.85rem;font-weight:700;color:var(--muted);margin:0 0 4px}
-/* Calcifer : cadrage sur le visage de l'image (assets/calcifer.png, 447×447), taille pilotée par --s */
+/* Calcifer : carré de 250 px de l'image (assets/calcifer.png, 447×447) centré sur le milieu des yeux (240, 182),
+   soit x 115→365, y 57→307. Taille d'affichage pilotée par --s : fond = 447/250 × s, décalage = -115/250 × s et -57/250 × s. */
 .calc{--s:28px;display:inline-block;width:var(--s);height:var(--s);border-radius:50%;flex:none;
-  background:url("assets/calcifer.png") no-repeat;background-size:calc(var(--s)*2.35) calc(var(--s)*2.35);
-  background-position:calc(var(--s)*-.684) calc(var(--s)*-.474);
+  background:url("assets/calcifer.png") no-repeat;background-size:calc(var(--s)*1.788) calc(var(--s)*1.788);
+  background-position:calc(var(--s)*-.46) calc(var(--s)*-.228);
   filter:grayscale(1) brightness(.55);opacity:.45;transition:filter .15s,opacity .15s,transform .15s}
 /* allumé : l'image orange est décalée en teinte (--hr) → bleu violacé (note 1) … rouge vif (note 10) */
 .calc.on{filter:hue-rotate(var(--hr,0deg)) saturate(1.6);opacity:1}
 .note .calc{--s:20px;vertical-align:-5px;margin-right:4px}
-.rating{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 6px}
-.rating button{background:none;border:0;padding:2px;cursor:pointer;border-radius:50%;line-height:0}
-.rating button:hover .calc{transform:scale(1.12)}
-.rating-val{font-size:.9rem;font-weight:700;margin:0 0 14px;min-height:1.4em}
+/* Note : un seul grand Calcifer + un vrai slider. La couleur suit le curseur en continu (variables posées en JS). */
+.calc.big{--s:72px;filter:hue-rotate(var(--hr,0deg)) saturate(var(--sat,1)) grayscale(var(--g,1)) brightness(var(--b,.55));opacity:var(--o,.45)}
+.rate-row{display:flex;align-items:center;gap:14px;margin:0 0 4px}
+.rate-col{flex:1;min-width:0}
+.slider{-webkit-appearance:none;appearance:none;display:block;width:100%;height:12px;border-radius:99px;margin:10px 0;cursor:pointer;
+  background:linear-gradient(90deg,#3d63ff,#8a4dff,#d03cff,#ff3cb4,#ff2a3a);outline-offset:6px;touch-action:pan-y}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:32px;height:32px;border-radius:50%;background:var(--panel);border:3px solid var(--ink);box-shadow:0 2px 0 var(--ink)}
+.slider::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--panel);border:3px solid var(--ink)}
+.slider::-moz-range-track{background:transparent}
+.rating-val{font-size:1.1rem;font-weight:900;margin:0;min-height:1.4em}
+.rating-hint{font-size:.8rem;color:var(--muted);margin:0 0 14px}
 tbody tr{cursor:pointer}
 tbody tr:hover td{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .empty{text-align:center;color:var(--muted);padding:22px 12px}
@@ -142,14 +150,10 @@ tbody tr:hover td{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .foot button{font:inherit;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;padding:0}
 @media (max-width:640px){
   tbody tr:hover td{background:none}
-  /* tactile : 2 rangées de 5 grosses cibles (≥ 44 px) plutôt que 10 minuscules */
-  .rating{display:grid;grid-template-columns:repeat(5,1fr);gap:6px 0;justify-items:center}
-  .rating button{padding:4px}
-  .rating .calc{--s:38px}
+  .calc.big{--s:64px}
   .fiche{padding:16px}
   .fiche .poster{width:96px;height:136px}
 }
-@media (hover:none){.rating button:hover .calc{transform:none}}
 button{touch-action:manipulation}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
@@ -211,8 +215,14 @@ button{touch-action:manipulation}
         <p class="syn" id="fSyn"></p>
         <div id="fRateBox" hidden>
           <p class="rating-label" id="fRateLabel"></p>
-          <div class="rating" id="fRating" role="group" aria-label="Note sur 10"></div>
-          <p class="rating-val" id="fRateVal" aria-live="polite"></p>
+          <div class="rate-row">
+            <span class="calc big" id="fCalc" aria-hidden="true"></span>
+            <div class="rate-col">
+              <input class="slider" id="fSlider" type="range" min="0" max="10" step="1" value="0" aria-label="Ta note sur 10">
+              <p class="rating-val" id="fRateVal" aria-live="polite"></p>
+            </div>
+          </div>
+          <p class="rating-hint">Glisse le curseur ; remets-le à 0 pour retirer la note.</p>
         </div>
         <div class="actions">
           <button class="btn primary" id="fSeen" type="button"></button>
@@ -379,8 +389,7 @@ function fillFiche(f){
   $("fRateBox").hidden=!seen[f.id];
   const r=ratings[f.id]||0;
   $("fRateLabel").textContent=r?"Ta note":"Tu l'as vu ! Quelle note lui donnes-tu ?";
-  $("fRating").innerHTML=Array.from({length:10},(_,k)=>`<button type="button" data-rate="${k+1}" aria-pressed="${r===k+1}" aria-label="${k+1} sur 10"><span class="calc${k<r?" on":""}" style="--hr:${hueShift(k+1)}"></span></button>`).join("");
-  $("fRateVal").textContent=r?`${r} / 10`:"";
+  $("fSlider").value=r; paintRating(r);
   $("fSeen").textContent=seen[f.id]?"Marquer pas vu":"Marquer comme vu";
   $("fSeen").dataset.seen=f.id;
   $("fNext").hidden=!!seen[f.id];
@@ -388,17 +397,17 @@ function fillFiche(f){
   $("fNext").dataset.next=f.id;
 }
 function openFiche(id){ ficheId=id; fillFiche(FILMS.find(f=>f.id===id)); if(!$("fiche").open) $("fiche").showModal(); }
-// Aperçu au survol / focus clavier : les Calcifer s'allument jusqu'à celui visé, puis reviennent à la note réelle.
+// Slider : `input` = aperçu en direct (couleur du Calcifer), `change` (relâchement) = enregistrement.
+// Calcifer éteint (gris) à 0 ; de 1 à 10, la teinte glisse du bleu violacé au rouge.
 function paintRating(n){
-  document.querySelectorAll("#fRating .calc").forEach((c,k)=>c.classList.toggle("on",k<n));
-  $("fRateVal").textContent=n?`${n} / 10`:"";
+  const c=$("fCalc").style;
+  if(n>0){ c.setProperty("--hr",hueShift(n)); c.setProperty("--sat","1.6"); c.setProperty("--g","0"); c.setProperty("--b","1"); c.setProperty("--o","1"); }
+  else { c.setProperty("--sat","1"); c.setProperty("--g","1"); c.setProperty("--b",".55"); c.setProperty("--o",".45"); }
+  $("fRateVal").textContent=n?`${n} / 10`:"Pas de note";
+  $("fSlider").setAttribute("aria-valuetext",n?`${n} sur 10`:"pas de note");
 }
-const rateTarget=e=>{ const b=e.target.closest("[data-rate]"); return b?+b.dataset.rate:0; };
-const restoreRating=()=>paintRating(ratings[ficheId]||0);
-$("fRating").addEventListener("mouseover",e=>{ const n=rateTarget(e); if(n) paintRating(n); });
-$("fRating").addEventListener("focusin",e=>{ const n=rateTarget(e); if(n) paintRating(n); });
-$("fRating").addEventListener("mouseleave",restoreRating);
-$("fRating").addEventListener("focusout",restoreRating);
+$("fSlider").addEventListener("input",e=>paintRating(+e.target.value));
+$("fSlider").addEventListener("change",e=>{ const v=+e.target.value; if(ficheId) setRating(ficheId,v||null); });
 $("fClose").addEventListener("click",()=>$("fiche").close());
 $("fiche").addEventListener("click",e=>{ if(e.target===$("fiche")) $("fiche").close(); }); // clic sur le fond
 
@@ -434,8 +443,6 @@ document.querySelector(".tabs").addEventListener("click",e=>{
 document.body.addEventListener("click",e=>{
   const t=e.target.closest("[data-fiche]");
   if(t){ openFiche(+t.dataset.fiche); return; }
-  const rt=e.target.closest("[data-rate]");
-  if(rt&&ficheId){ const v=+rt.dataset.rate; setRating(ficheId,ratings[ficheId]===v?null:v); return; } // re-clic = retirer la note
   const n=e.target.closest("[data-next]");
   if(n){ const id=+n.dataset.next; setNext(id,!next[id]); return; }
   const s=e.target.closest("[data-seen]");
