@@ -10,7 +10,7 @@
  * Tous les chemins sont relatifs : l'appli est servie dans un sous-dossier
  * (https://<user>.github.io/GhibliFilms/).
  */
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL_CACHE = `ghibli-shell-${VERSION}`;
 const ASSET_CACHE = `ghibli-assets-${VERSION}`; // affiches, polices, SDK Firebase
 

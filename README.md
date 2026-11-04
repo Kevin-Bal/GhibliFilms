@@ -7,6 +7,16 @@ entre appareils ; sans config Firebase, l'app tourne en mode local (navigateur).
 La barre de recherche filtre la liste (en plus de l'onglet choisi) sur le titre français ou
 original, l'année, le réalisateur et le synopsis, sans tenir compte des accents ni de la casse.
 
+## Design : Material 3
+
+L'interface suit Material Design 3 (Material You) : rôles de couleur, formes arrondies, police
+Roboto, puces de filtre, FAB étendu, interrupteur, barre de recherche, boîte de dialogue, couches
+d'état et ondulation au toucher. Pas de bibliothèque : tout est du CSS au début de `index.html`.
+Les couleurs (clair et sombre, via `light-dark()`) ont été générées avec
+`@material/material-color-utilities` à partir du vert `#3f8f6b`, avec l'ambre de Calcifer en
+tertiaire ; pour changer de palette, régénère les rôles `--md-*` depuis une autre couleur.
+Le thème suit le système, ou se force avec `<html data-theme="light|dark">`.
+
 ## Brancher Firebase (une seule fois)
 
 1. console.firebase.google.com → créer un projet (forfait Spark gratuit).
