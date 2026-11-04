@@ -72,6 +72,9 @@ h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:900;margin:0 0 4px;letter-spac
 .tab{font:inherit;font-weight:700;font-size:.9rem;background:transparent;color:var(--muted);border:2px solid var(--line);border-radius:999px;padding:5px 14px;cursor:pointer}
 .tab[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .progress{margin-left:auto;font-size:.9rem;color:var(--muted)}
+.search{display:block;width:100%;font:inherit;font-weight:500;font-size:1rem;color:var(--ink);background:var(--panel);border:2px solid var(--ink);border-radius:999px;padding:10px 18px;margin-bottom:12px;-webkit-appearance:none;appearance:none}
+.search::placeholder{color:var(--muted);opacity:1}
+.search::-webkit-search-cancel-button{cursor:pointer}
 .meter{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:14px}
 .meter i{display:block;height:100%;background:var(--seen);width:0;transition:width .3s}
 
@@ -195,6 +198,8 @@ button{touch-action:manipulation}
       </div>
     </div>
   </section>
+
+  <input class="search" id="q" type="search" placeholder="Rechercher : titre, année, réalisateur…" aria-label="Rechercher un film (titre, année, réalisateur, synopsis)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
 
   <div class="bar">
     <div class="tabs" role="group" aria-label="Filtrer">
@@ -339,7 +344,19 @@ function refresh(){ render(); if(ficheId&&$("fiche").open) fillFiche(FILMS.find(
 // Décalage de teinte appliqué au Calcifer (orange, ~35°) pour la note n : 1 → bleu violacé (~275°), 10 → rouge (~357°),
 // en passant par violet et magenta (on monte, on ne traverse pas vert/jaune). Valeurs réglées à l'œil.
 const hueShift=n=>Math.round(240+(n-1)/9*90)+"deg";
-let dirFilter="", onlyList=false, ficheId=null;
+let dirFilter="", onlyList=false, ficheId=null, query="";
+// Recherche : insensible à la casse, aux accents et au type d'apostrophe (’ des claviers mobiles).
+// Chaque mot saisi doit se retrouver (ET) dans les titres FR/EN, l'année ou le réalisateur (partout dans le texte),
+// ou au début d'un mot du synopsis (évite que « mer » ressorte dans « chimère »).
+const norm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’‘`´]/g,"'").toLowerCase();
+const SEARCH=new Map(FILMS.map(f=>[f.id,{
+  meta:norm([f.fr,f.en,f.y,f.d].join(" ")),
+  words:norm((FILM_INFO[f.id]||{}).s||"").split(/[^a-z0-9]+/).filter(Boolean)
+}]));
+function matches(f){
+  const tokens=norm(query).split(/\s+/).filter(Boolean), s=SEARCH.get(f.id);
+  return tokens.every(t=>s.meta.includes(t)||s.words.some(w=>w.startsWith(t)));
+}
 const unseenList=()=>FILMS.filter(f=>!seen[f.id]&&(!dirFilter||f.d===dirFilter)&&(!onlyList||next[f.id]));
 
 function posterStyle(f){
@@ -357,14 +374,17 @@ function posterHTML(f){
 }
 
 function render(){
-  let list=FILMS.filter(f=>filter==="all"||(filter==="seen"?seen[f.id]:filter==="next"?next[f.id]:filter==="rank"?ratings[f.id]:!seen[f.id]));
-  if(filter==="rank") list.sort((a,b)=>ratings[b.id]-ratings[a.id]||a.y-b.y); // meilleure note d'abord, égalité : le plus ancien
+  const base=FILMS.filter(f=>filter==="all"||(filter==="seen"?seen[f.id]:filter==="next"?next[f.id]:filter==="rank"?ratings[f.id]:!seen[f.id]));
+  if(filter==="rank") base.sort((a,b)=>ratings[b.id]-ratings[a.id]||a.y-b.y); // meilleure note d'abord, égalité : le plus ancien
+  const rankOf=new Map(base.map((f,i)=>[f.id,i+1])); // le rang reste celui du classement complet, même filtré par la recherche
+  const list=query.trim()?base.filter(matches):base;
   const emptyMsg={rank:"Aucune note pour l'instant : ouvre la fiche d'un film vu pour le noter.",next:"Ta liste est vide : ajoute des films avec ☆.",seen:"Tu n'as encore marqué aucun film comme vu."}[filter];
-  $("empty").hidden=!(emptyMsg&&!list.length); $("empty").textContent=emptyMsg||"";
-  $("rows").innerHTML=list.map((f,i)=>`
+  const msg=list.length?"":query.trim()?`Aucun film ne correspond à « ${query.trim()} »${filter==="all"?"":" dans cet onglet"}.`:emptyMsg;
+  $("empty").hidden=!msg; $("empty").textContent=msg||"";
+  $("rows").innerHTML=list.map(f=>`
     <tr class="${picked===f.id?"picked":""}" data-id="${f.id}">
       <td class="p">${posterHTML(f)}</td>
-      <td class="t"><button class="title-btn" data-fiche="${f.id}" type="button">${filter==="rank"?"#"+(i+1)+" · ":""}${f.fr}</button><small>${f.en}</small></td>
+      <td class="t"><button class="title-btn" data-fiche="${f.id}" type="button">${filter==="rank"?"#"+rankOf.get(f.id)+" · ":""}${f.fr}</button><small>${f.en}</small></td>
       <td class="y">${f.y}</td>
       <td class="d" data-y="${f.y}">${f.d}</td>
       <td class="s"><button class="status ${seen[f.id]?"seen":"unseen"}" data-seen="${f.id}" type="button">${seen[f.id]?"Vu":"Pas vu"}</button></td>
@@ -439,6 +459,7 @@ function draw(){
 const dirs=[...new Set(FILMS.map(f=>f.d))].sort((a,b)=>FILMS.filter(f=>f.d===b).length-FILMS.filter(f=>f.d===a).length||a.localeCompare(b));
 $("dir").innerHTML='<option value="">Tous les réalisateurs</option>'+dirs.map(d=>`<option value="${d}">${d} (${FILMS.filter(f=>f.d===d).length})</option>`).join("");
 $("dir").addEventListener("change",e=>{dirFilter=e.target.value;render();});
+$("q").addEventListener("input",e=>{query=e.target.value;render();});
 $("drawBtn").addEventListener("click",draw);
 $("rAgain").addEventListener("click",draw);
 $("onlyList").addEventListener("change",e=>{onlyList=e.target.checked;render();});

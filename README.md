@@ -4,6 +4,9 @@ Liste des films Ghibli avec statut vu / pas vu, tirage au sort, fiches détaill�
 Tout est sauvegardé dans **Firebase (Firestore)** et synchronisé
 entre appareils ; sans config Firebase, l'app tourne en mode local (navigateur).
 
+La barre de recherche filtre la liste (en plus de l'onglet choisi) sur le titre français ou
+original, l'année, le réalisateur et le synopsis, sans tenir compte des accents ni de la casse.
+
 ## Brancher Firebase (une seule fois)
 
 1. console.firebase.google.com → créer un projet (forfait Spark gratuit).
