@@ -21,6 +21,17 @@ automatiquement dans Firebase.
 - `ghibli/ratings` : `{ ratings: { "<idFilm>": 1..10 } }` (notes sur 10, onglet Classement)
 - `ghibli/next` : `{ next: { "<idFilm>": true|false } }` (liste « à regarder ensuite »)
 
+## Application installable (PWA)
+
+L'appli est une PWA : `manifest.webmanifest` (nom, icônes, mode plein écran) et
+`sw.js` (service worker) la rendent installable (« Ajouter à l'écran d'accueil » /
+« Installer l'application ») et utilisable hors-ligne. Les icônes (Calcifer) sont dans
+`assets/icons/`. Le service worker met en cache l'appli, les affiches, la police et le SDK
+Firebase ; les fichiers de l'appli sont lus en priorité sur le réseau, donc une mise à jour
+poussée sur GitHub est visible dès la visite suivante. Si tu ajoutes un fichier à l'appli,
+ajoute-le à la liste `SHELL` de `sw.js` (et change `VERSION` pour repartir d'un cache propre).
+Un service worker exige HTTPS (GitHub Pages) ou `localhost`.
+
 ## Lancer en local
 
 ```bash

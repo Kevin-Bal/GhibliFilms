@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "Mes films Ghibli",
+  "short_name": "Ghibli",
+  "description": "Suivi des films Ghibli vus / pas vus, tirage au sort, notes et liste à regarder.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e8f2f1",
+  "theme_color": "#e8f2f1",
+  "categories": ["entertainment", "lifestyle"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
