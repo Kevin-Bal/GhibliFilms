@@ -17,6 +17,14 @@ Les couleurs (clair et sombre, via `light-dark()`) ont été générées avec
 tertiaire ; pour changer de palette, régénère les rôles `--md-*` depuis une autre couleur.
 Le thème suit le système, ou se force avec `<html data-theme="light|dark">`.
 
+Le mouvement suit M3 expressif : des ressorts (rapide, défaut, lent, plus des ressorts « effets » sans
+rebond) définis en variables CSS `--sp-*` / `--fx-*` (courbes `linear()` calculées depuis les
+paramètres de `MotionScheme.expressive` de Compose, repli en Bézier). Au programme : entrée en
+cascade de la page et des lignes, lignes qui glissent quand le filtre change, formes qui se
+déforment à l'appui, coche qui se déploie sur les puces, rebond des étoiles / de « Vu » / de la
+note, dialogue qui s'ouvre et se ferme en douceur, effet « rouleau » du tirage, flamme de Calcifer
+qui respire. Tout est coupé avec « réduire les animations » (réglage d'accessibilité du système).
+
 ## Brancher Firebase (une seule fois)
 
 1. console.firebase.google.com → créer un projet (forfait Spark gratuit).

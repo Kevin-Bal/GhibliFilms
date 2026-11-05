@@ -61,6 +61,11 @@
   --e1:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);
   --e3:0 1px 3px rgba(0,0,0,.3),0 4px 8px 3px rgba(0,0,0,.15);
   --ease:cubic-bezier(.2,0,0,1);
+  /* mouvement M3 expressif : ressorts spatiaux (avec rebond) et d'effets (sans rebond).
+     Durées = temps de stabilisation du ressort ; courbes linear() ci-dessous, repli en Bézier. */
+  --sp-fast-d:.35s;--sp-d:.42s;--sp-slow-d:.57s;--fx-fast-d:.14s;--fx-d:.22s;--fx-slow-d:.3s;
+  --sp-fast:cubic-bezier(.34,1.45,.64,1);--sp:cubic-bezier(.2,0,0,1);--sp-slow:cubic-bezier(.2,0,0,1);
+  --fx-fast:cubic-bezier(.2,0,0,1);--fx:cubic-bezier(.2,0,0,1);--fx-slow:cubic-bezier(.2,0,0,1);
   --font:Roboto,"Google Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --gutter:16px;
   --ic-check:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
@@ -68,6 +73,15 @@
 :root[data-theme="light"]{color-scheme:light}
 :root[data-theme="dark"]{color-scheme:dark}
 @media (min-width:640px){:root{--gutter:24px}}
+/* ressorts M3 (Compose MotionScheme.expressive : rapide 800/0,6 · défaut 380/0,8 · lent 200/0,8 ; effets 3800 · 1600 · 800, amortissement 1) */
+@supports (transition-timing-function:linear(0,1)){:root{
+  --sp-fast:linear(0,0.034,0.12,0.238,0.372,0.508,0.638,0.754,0.853,0.934,0.997,1.042,1.071,1.088,1.094,1.093,1.086,1.076,1.063,1.05,1.038,1.026,1.016,1.008,1.002,0.997,0.994,0.992,0.991,0.991,0.992,0.993,0.994,0.995,0.996,0.997,1);
+  --sp:linear(0,0.023,0.081,0.161,0.253,0.349,0.444,0.534,0.616,0.69,0.755,0.811,0.858,0.896,0.928,0.953,0.972,0.987,0.997,1.005,1.01,1.013,1.015,1.015,1.015,1.014,1.013,1.011,1.01,1.008,1.007,1.006,1.005,1.004,1.003,1.002,1);
+  --sp-slow:linear(0,0.022,0.079,0.157,0.247,0.342,0.435,0.524,0.607,0.681,0.746,0.802,0.85,0.889,0.921,0.947,0.968,0.983,0.995,1.003,1.009,1.012,1.014,1.015,1.015,1.014,1.013,1.012,1.011,1.009,1.008,1.006,1.005,1.004,1.003,1.003,1);
+  --fx-fast:linear(0,0.127,0.349,0.552,0.706,0.813,0.884,0.929,0.957,0.974,0.985,0.991,0.995,0.997,1);
+  --fx:linear(0,0.131,0.358,0.562,0.716,0.821,0.89,0.934,0.961,0.977,0.986,0.992,0.995,0.997,1);
+  --fx-slow:linear(0,0.124,0.342,0.543,0.697,0.805,0.878,0.925,0.954,0.972,0.984,0.99,0.994,0.997,1);
+}}
 
 html{height:100%;-webkit-text-size-adjust:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
@@ -92,11 +106,39 @@ h1{display:flex;align-items:center;gap:14px;margin:0 0 4px;font-size:clamp(1.75r
 .ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;transform:scale(0);animation:ripple .55s var(--ease) forwards}
 @keyframes ripple{from{opacity:.14;transform:scale(0)}to{opacity:0;transform:scale(1)}}
 
+/* ----- mouvement : les formes se déforment à l'appui (M3 expressif) et reviennent avec un ressort ----- */
+.btn,.btn-draw,.tab,.status{transition:border-radius var(--sp-fast-d) var(--sp-fast),transform var(--sp-fast-d) var(--sp-fast),background-color var(--fx-d) var(--fx),color var(--fx-d) var(--fx),border-color var(--fx-d) var(--fx),box-shadow var(--fx-d) var(--fx)}
+.pin{transition:transform var(--sp-fast-d) var(--sp-fast),color var(--fx-d) var(--fx)}
+.btn:active{border-radius:var(--r-md);transform:scale(.97)}
+.btn-draw:active{border-radius:28px;transform:scale(.97)}
+.tab:active,.status:active{border-radius:16px;transform:scale(.95)}
+.pin:active{transform:scale(.82)}
+@media (hover:hover){.btn-draw:hover:not(:disabled){box-shadow:0 2px 3px rgba(0,0,0,.3),0 6px 10px 4px rgba(0,0,0,.15)}}
+
+/* entrée de page : les blocs montent en cascade ; la liste s'anime en JS (apparition + déplacement) */
+.wrap>:not(dialog):not(.tablewrap){animation:rise var(--sp-d) var(--sp) backwards;animation-delay:calc(var(--i,0)*45ms)}
+.wrap>:nth-child(2){--i:1}.wrap>:nth-child(3){--i:2}.wrap>:nth-child(4){--i:3}.wrap>:nth-child(5){--i:4}.wrap>:nth-child(6){--i:5}.wrap>:nth-child(7){--i:6}.wrap>:nth-child(10){--i:8}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}}
+/* Calcifer du titre : la flamme respire */
+h1 .calc{animation:flicker 3.8s ease-in-out infinite}
+@keyframes flicker{
+  0%,100%{transform:scale(1);filter:saturate(1.6) brightness(1)}
+  18%{transform:scale(1.05,.97);filter:saturate(1.7) brightness(1.12)}
+  42%{transform:scale(.97,1.04);filter:saturate(1.55) brightness(.95)}
+  66%{transform:scale(1.03,1);filter:saturate(1.65) brightness(1.08)}
+  84%{transform:scale(1,1.02);filter:saturate(1.6) brightness(1.02)}
+}
+/* ligne tirée au sort : fond qui s'allume + affiche qui rebondit */
+tr.just td{animation:pickIn var(--sp-slow-d) var(--fx-slow)}
+tr.just .poster{animation:pickPop var(--sp-fast-d) var(--sp-fast)}
+@keyframes pickIn{from{background-color:transparent}}
+@keyframes pickPop{from{transform:scale(.8) rotate(-5deg)}}
+
 /* ----- tirage : carte + FAB étendu ----- */
 .draw{background:var(--md-surface-container);border-radius:var(--r-xl);padding:24px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
 .draw-main{flex:1 1 270px;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
 .btn-draw{display:inline-flex;align-items:center;justify-content:center;gap:12px;height:56px;padding:0 24px 0 20px;border:0;border-radius:var(--r-lg);
-  background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);font-weight:500;font-size:1rem;letter-spacing:.01em;cursor:pointer;box-shadow:var(--e3);transition:box-shadow .2s var(--ease)}
+  background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);font-weight:500;font-size:1rem;letter-spacing:.01em;cursor:pointer;box-shadow:var(--e3)}
 .btn-draw svg{width:24px;height:24px;flex:none}
 .btn-draw:disabled{background:color-mix(in srgb,var(--md-on-surface) 12%,transparent);color:color-mix(in srgb,var(--md-on-surface) 38%,transparent);box-shadow:none;cursor:not-allowed}
 .count{margin:0;color:var(--md-on-surface-variant);font-size:.875rem;line-height:1.43}
@@ -117,8 +159,8 @@ h1{display:flex;align-items:center;gap:14px;margin:0 0 4px;font-size:clamp(1.75r
 
 /* interrupteur M3 */
 .onlylist{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;max-width:340px;min-height:48px;cursor:pointer;font-size:1rem;line-height:1.5}
-.switch{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:52px;height:32px;margin:0;border-radius:16px;border:2px solid var(--md-outline);background:var(--md-surface-container-highest);cursor:pointer;transition:background .2s var(--ease),border-color .2s var(--ease)}
-.switch::before{content:"";position:absolute;top:50%;left:6px;width:16px;height:16px;border-radius:50%;background:var(--md-outline);transform:translateY(-50%);transition:left .2s var(--ease),width .2s var(--ease),height .2s var(--ease),background .2s var(--ease)}
+.switch{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:52px;height:32px;margin:0;border-radius:16px;border:2px solid var(--md-outline);background:var(--md-surface-container-highest);cursor:pointer;transition:background-color var(--fx-d) var(--fx),border-color var(--fx-d) var(--fx)}
+.switch::before{content:"";position:absolute;top:50%;left:6px;width:16px;height:16px;border-radius:50%;background:var(--md-outline);transform:translateY(-50%);transition:left var(--sp-fast-d) var(--sp-fast),width var(--sp-fast-d) var(--sp-fast),height var(--sp-fast-d) var(--sp-fast),background-color var(--fx-d) var(--fx)}
 .switch:checked{background:var(--md-primary);border-color:var(--md-primary)}
 .switch:checked::before{left:22px;width:24px;height:24px;background:var(--md-on-primary)}
 .switch:active::before{width:28px;height:28px;left:4px}
@@ -132,18 +174,25 @@ h1{display:flex;align-items:center;gap:14px;margin:0 0 4px;font-size:clamp(1.75r
 .search::placeholder{color:var(--md-on-surface-variant);opacity:1}
 .search::-webkit-search-cancel-button,.search::-webkit-search-decoration{-webkit-appearance:none;display:none}
 .icon-btn{position:absolute;right:4px;top:4px;display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--md-on-surface-variant);cursor:pointer}
-.icon-btn[hidden]{display:none}
+/* la croix d'effacement apparaît / disparaît en grossissant */
+.icon-btn{transition:opacity var(--fx-d) var(--fx),transform var(--sp-fast-d) var(--sp-fast),display var(--fx-d) allow-discrete}
+.icon-btn:active{transform:scale(.82)}
+.icon-btn[hidden]{display:none;opacity:0;transform:scale(.5)}
+@starting-style{.icon-btn{opacity:0;transform:scale(.5)}}
 .icon-btn svg{width:24px;height:24px}
 
 /* ----- puces de filtre M3 ----- */
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:6px var(--gutter);margin:-6px calc(var(--gutter)*-1) 0;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:none;display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 16px;border:1px solid var(--md-outline);border-radius:var(--r-sm);background:transparent;color:var(--md-on-surface-variant);font-weight:500;font-size:.875rem;line-height:1.43;letter-spacing:.01em;cursor:pointer;white-space:nowrap}
+/* la coche se déploie quand la puce est sélectionnée */
+.tab{transition-property:border-radius,transform,background-color,color,border-color,box-shadow,padding}
+.tab::before{content:"";flex:none;width:0;height:18px;margin-right:-8px;opacity:0;background:currentColor;-webkit-mask:var(--ic-check) center/contain no-repeat;mask:var(--ic-check) center/contain no-repeat;transition:width var(--sp-fast-d) var(--sp-fast),margin var(--sp-fast-d) var(--sp-fast),opacity var(--fx-d) var(--fx)}
 .tab[aria-pressed="true"]{padding-left:8px;border-color:transparent;background:var(--md-secondary-container);color:var(--md-on-secondary-container)}
-.tab[aria-pressed="true"]::before{content:"";width:18px;height:18px;background:currentColor;-webkit-mask:var(--ic-check) center/contain no-repeat;mask:var(--ic-check) center/contain no-repeat}
+.tab[aria-pressed="true"]::before{width:18px;margin-right:0;opacity:1}
 .progress{margin:20px 4px 8px;font-size:.875rem;line-height:1.43;color:var(--md-on-surface-variant)}
 .meter{height:8px;background:var(--md-secondary-container);border-radius:99px;overflow:hidden;margin-bottom:16px}
-.meter i{display:block;height:100%;background:var(--md-primary);border-radius:99px;width:0;transition:width .3s var(--ease)}
+.meter i{display:block;height:100%;background:var(--md-primary);border-radius:99px;width:0;transition:width var(--sp-slow-d) var(--sp-slow)}
 
 /* ----- liste (tableau) ----- */
 .tablewrap{overflow-x:auto;background:var(--md-surface-container-low);border-radius:var(--r-xl)}
@@ -177,16 +226,21 @@ td.y,td.d{white-space:nowrap;font-size:.875rem;color:var(--md-on-surface-variant
 .note small{font-weight:400;color:var(--md-on-surface-variant)}
 
 /* boutons M3 : rempli, contour */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 24px;border:1px solid var(--md-outline);border-radius:999px;background:transparent;color:var(--md-primary);font-weight:500;font-size:.875rem;line-height:1.43;letter-spacing:.01em;white-space:nowrap;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 24px;border:1px solid var(--md-outline);border-radius:20px;background:transparent;color:var(--md-primary);font-weight:500;font-size:.875rem;line-height:1.43;letter-spacing:.01em;white-space:nowrap;cursor:pointer}
 .btn svg{width:18px;height:18px;flex:none;margin-left:-8px}
 .btn.primary{border-color:transparent;background:var(--md-primary);color:var(--md-on-primary)}
 .btn.text{border-color:transparent;padding:0 12px}
 
 /* ----- boîte de dialogue M3 (fiche d'un film) ----- */
 dialog{border:0;border-radius:var(--r-xl);padding:0;max-width:560px;width:calc(100% - 32px);max-height:calc(100% - 32px);overflow:auto;background:var(--md-surface-container-high);color:var(--md-on-surface);box-shadow:var(--e3)}
-dialog::backdrop{background:rgba(0,0,0,.32)}
-dialog[open]{animation:dlg .25s var(--ease)}
-@keyframes dlg{from{opacity:0;transform:translateY(16px) scale(.97)}}
+/* ouverture : ressort (monte et se déploie) ; fermeture : sortie plus rapide, sans rebond. `display`/`overlay` en
+   allow-discrete gardent la boîte visible le temps de la transition (repli : apparition/disparition instantanée). */
+dialog{opacity:0;transform:translateY(32px) scale(.88);transition:opacity var(--fx-fast-d) linear,transform .2s cubic-bezier(.3,0,.8,.15),overlay .2s allow-discrete,display .2s allow-discrete}
+dialog[open]{opacity:1;transform:none;transition:opacity var(--fx-d) linear,transform var(--sp-d) var(--sp),overlay var(--sp-d) allow-discrete,display var(--sp-d) allow-discrete}
+@starting-style{dialog[open]{opacity:0;transform:translateY(32px) scale(.88)}}
+dialog::backdrop{background:rgba(0,0,0,0);transition:background-color .2s linear,overlay .2s allow-discrete,display .2s allow-discrete}
+dialog[open]::backdrop{background:rgba(0,0,0,.32);transition-duration:var(--sp-d),var(--sp-d),var(--sp-d)}
+@starting-style{dialog[open]::backdrop{background:rgba(0,0,0,0)}}
 .fiche{display:flex;gap:20px;padding:24px 24px 0;flex-wrap:wrap}
 .fiche .poster{width:120px;height:170px;flex:none;border-radius:var(--r-md)}
 .fiche-body{flex:1 1 220px;min-width:0}
@@ -202,8 +256,11 @@ dialog[open]{animation:dlg .25s var(--ease)}
 .rate-col{flex:1;min-width:0}
 .slider{-webkit-appearance:none;appearance:none;display:block;width:100%;height:16px;border-radius:8px;margin:16px 0;cursor:pointer;
   background:linear-gradient(90deg,#3d63ff,#8a4dff,#d03cff,#ff3cb4,#ff2a3a);outline-offset:8px;touch-action:pan-y}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:content-box;width:6px;height:36px;border-radius:5px;background:var(--md-on-surface);border:4px solid var(--md-surface-container-high)}
-.slider::-moz-range-thumb{box-sizing:content-box;width:6px;height:36px;border-radius:5px;background:var(--md-on-surface);border:4px solid var(--md-surface-container-high)}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:content-box;width:6px;height:36px;border-radius:5px;background:var(--md-on-surface);border:4px solid var(--md-surface-container-high);transition:width var(--sp-fast-d) var(--sp-fast),height var(--sp-fast-d) var(--sp-fast)}
+.slider::-moz-range-thumb{box-sizing:content-box;width:6px;height:36px;border-radius:5px;background:var(--md-on-surface);border:4px solid var(--md-surface-container-high);transition:width var(--sp-fast-d) var(--sp-fast),height var(--sp-fast-d) var(--sp-fast)}
+/* la poignée s'affine quand on la tient (M3 expressif) */
+.slider:active::-webkit-slider-thumb{width:3px;height:42px}
+.slider:active::-moz-range-thumb{width:3px;height:42px}
 .slider::-moz-range-track{background:transparent}
 .rating-val{font-size:1rem;font-weight:500;margin:0;min-height:1.5em}
 .rating-hint{font-size:.75rem;line-height:1.33;color:var(--md-on-surface-variant);margin:4px 0 16px}
@@ -388,6 +445,38 @@ const icon=d=>`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><
 const STAR=icon("M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
 const STAR_OUTLINE=icon("M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z");
 
+/* ---------- mouvement (M3 expressif) : ressorts lus dans les variables CSS --sp-*, --fx-* ---------- */
+const reduceMotion=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const spring=(kind="sp")=>({duration:parseFloat(cssVar(`--${kind}-d`))*1000, easing:cssVar(`--${kind}`)});
+// rebond d'un élément qu'on vient de basculer (étoile, puce Vu, note…)
+function popEl(el,from="scale(.55) rotate(-25deg)"){
+  if(!el||reduceMotion()) return;
+  el.animate([{transform:from},{transform:"none"}],spring("sp-fast"));
+}
+let popSel=null, popDialog=false, justPicked=null, firstRender=true; // cible du prochain rebond, ligne tout juste tirée
+// Lignes : celles qui arrivent apparaissent en cascade, celles qui restent glissent vers leur nouvelle place (FLIP).
+const entering=new Map(); // id → {delay, t0} : une entrée en cours survit à un nouveau rendu (ex. 1re synchro Firebase)
+function enterRow(tr,id,delay,t0){
+  const a=tr.animate([{opacity:0,transform:"translateY(20px) scale(.98)"},{opacity:1,transform:"none"}],{...spring("sp"),delay,fill:"backwards"});
+  a.currentTime=performance.now()-t0;
+  entering.set(id,{delay,t0}); a.onfinish=()=>entering.delete(id);
+}
+function animateRows(before){
+  if(reduceMotion()){ firstRender=false; return; }
+  const base=firstRender?250:0; // au chargement, la liste attend que l'en-tête soit en place
+  let k=0;
+  for(const tr of $("rows").children){
+    const id=+tr.dataset.id, top=tr.getBoundingClientRect().top, e=entering.get(id);
+    if(e) enterRow(tr,id,e.delay,e.t0);
+    else if(before.has(id)){
+      const dy=before.get(id)-top;
+      if(Math.abs(dy)>1) tr.animate([{transform:`translateY(${dy}px)`},{transform:"none"}],spring("sp"));
+    }else if(top<innerHeight&&top>-80) enterRow(tr,id,base+Math.min(k++,10)*40,performance.now());
+  }
+  firstRender=false;
+}
+
 /* ---------- synchronisation Firebase ---------- */
 const online=cloud.isConfigured();
 function setSync(txt,bad){ const el=$("sync"); el.textContent=txt; el.classList.toggle("bad",!!bad); }
@@ -418,6 +507,7 @@ function startSync(){
 }
 
 function setSeen(id,v){
+  if(v) popSel=`#rows [data-seen="${id}"]`;
   if(v) seen[id]=true; else delete seen[id];
   cacheSeen();
   cloudCall(()=>cloud.setSeen(id,v));
@@ -426,17 +516,26 @@ function setSeen(id,v){
   else refresh();
 }
 function setRating(id,v){
+  if(v) popSel=`#rows tr[data-id="${id}"] .note .calc`;
   if(v) ratings[id]=v; else delete ratings[id];
   cacheRatings(); refresh();
   cloudCall(()=>cloud.setRating(id,v));
 }
 function setNext(id,v){
+  if(v){ popSel=`#rows [data-next="${id}"] svg`; popDialog=true; }
   if(v) next[id]=true; else delete next[id];
   cacheNext(); refresh();
   cloudCall(()=>cloud.setNext(id,v));
 }
 // re-rend la liste + la fiche si elle est ouverte
-function refresh(){ render(); if(ficheId&&$("fiche").open) fillFiche(FILMS.find(f=>f.id===ficheId)); }
+function refresh(){
+  render();
+  if(ficheId&&$("fiche").open){
+    fillFiche(FILMS.find(f=>f.id===ficheId));
+    if(popDialog) popEl($("fNext").querySelector("svg"));
+  }
+  popDialog=false;
+}
 // Décalage de teinte appliqué au Calcifer (orange, ~35°) pour la note n : 1 → bleu violacé (~275°), 10 → rouge (~357°),
 // en passant par violet et magenta (on monte, on ne traverse pas vert/jaune). Valeurs réglées à l'œil.
 const hueShift=n=>Math.round(240+(n-1)/9*90)+"deg";
@@ -477,8 +576,9 @@ function render(){
   const emptyMsg={rank:"Aucune note pour l'instant : ouvre la fiche d'un film vu pour le noter.",next:"Ta liste est vide : ajoute des films avec ☆.",seen:"Tu n'as encore marqué aucun film comme vu."}[filter];
   const msg=list.length?"":query.trim()?`Aucun film ne correspond à « ${query.trim()} »${filter==="all"?"":" dans cet onglet"}.`:emptyMsg;
   $("empty").hidden=!msg; $("empty").textContent=msg||"";
+  const before=new Map([...$("rows").children].map(tr=>[+tr.dataset.id,tr.getBoundingClientRect().top])); // positions avant, pour animer
   $("rows").innerHTML=list.map(f=>`
-    <tr class="${picked===f.id?"picked":""}" data-id="${f.id}">
+    <tr class="${picked===f.id?"picked":""}${justPicked===f.id?" just":""}" data-id="${f.id}">
       <td class="p">${posterHTML(f)}</td>
       <td class="t"><button class="title-btn" data-fiche="${f.id}" type="button">${filter==="rank"?"#"+rankOf.get(f.id)+" · ":""}${f.fr}</button><small>${f.en}</small></td>
       <td class="y">${f.y}</td>
@@ -487,6 +587,8 @@ function render(){
       <td class="r">${ratings[f.id]?`<span class="note"><span class="calc on" style="--hr:${hueShift(ratings[f.id])}" aria-hidden="true"></span>${ratings[f.id]}<small>/10</small></span>`:""}</td>
       <td class="n">${seen[f.id]?"":`<button class="pin${next[f.id]?" on":""}" data-next="${f.id}" aria-pressed="${!!next[f.id]}" aria-label="${next[f.id]?"Retirer de":"Ajouter à"} ma liste : ${f.fr}" type="button">${next[f.id]?STAR:STAR_OUTLINE}</button>`}</td>
     </tr>`).join("");
+  animateRows(before); justPicked=null;
+  if(popSel){ popEl(document.querySelector(popSel),/data-seen/.test(popSel)?"scale(.72)":/\.calc/.test(popSel)?"scale(.3)":undefined); popSel=null; }
   const n=FILMS.filter(f=>seen[f.id]).length, left=FILMS.length-n;
   $("progress").textContent=`${n} vus sur ${FILMS.length}`;
   $("meter").style.width=(n/FILMS.length*100)+"%";
@@ -497,7 +599,12 @@ function render(){
 }
 
 function showResult(f,rolling){
-  const r=$("result"); r.hidden=false; r.classList.toggle("rolling",!!rolling);
+  const r=$("result"), wasHidden=r.hidden; r.hidden=false; r.classList.toggle("rolling",!!rolling);
+  if(!reduceMotion()){
+    if(wasHidden) r.animate([{opacity:0,transform:"translateY(16px) scale(.96)"},{opacity:1,transform:"none"}],spring("sp"));
+    if(rolling) $("rTitle").animate([{opacity:.15,transform:"translateY(-10px)"},{opacity:1,transform:"none"}],{duration:160,easing:cssVar("--fx")}); // effet « rouleau »
+    else popEl($("rPoster"),"scale(.8) rotate(-5deg)");
+  }
   const p=posterStyle(f), el=$("rPoster");
   el.className="poster"+(p.img?" img":""); el.style.cssText=p.css; el.setAttribute("aria-label","Affiche de "+f.fr);
   el.firstElementChild.textContent=f.fr.split(" ").slice(0,3).join(" ");
@@ -532,7 +639,10 @@ function paintRating(n){
   $("fRateVal").textContent=n?`${n} / 10`:"Pas de note";
   $("fSlider").setAttribute("aria-valuetext",n?`${n} sur 10`:"pas de note");
 }
-$("fSlider").addEventListener("input",e=>paintRating(+e.target.value));
+$("fSlider").addEventListener("input",e=>{
+  paintRating(+e.target.value);
+  if(!reduceMotion()) $("fCalc").animate([{transform:"scale(1.18)"},{transform:"none"}],spring("sp-fast")); // Calcifer réagit à chaque cran
+});
 $("fSlider").addEventListener("change",e=>{ const v=+e.target.value; if(ficheId) setRating(ficheId,v||null); });
 $("fClose").addEventListener("click",()=>$("fiche").close());
 $("fiche").addEventListener("click",e=>{ if(e.target===$("fiche")) $("fiche").close(); }); // clic sur le fond
@@ -546,7 +656,7 @@ function draw(){
   $("drawBtn").disabled=true;
   const tick=()=>{
     if(i<steps){ showResult(pool[Math.floor(Math.random()*pool.length)],true); i++; timer=setTimeout(tick,70+i*12); }
-    else { timer=null; picked=choice.id; showResult(choice,false); render();
+    else { timer=null; picked=choice.id; justPicked=choice.id; showResult(choice,false); render();
       const row=document.querySelector("tr.picked"); if(row&&filter!=="seen") row.scrollIntoView({block:"nearest",behavior:reduce?"auto":"smooth"}); }
   };
   tick();
