@@ -7,10 +7,11 @@ entre appareils ; sans config Firebase, l'app tourne en mode local (navigateur).
 La barre de recherche filtre la liste (en plus de l'onglet choisi) sur le titre français ou
 original, l'année, le réalisateur et le synopsis, sans tenir compte des accents ni de la casse.
 
-## Design : Liquid Glass (branche `design/liquid-glass`)
+## Design : Liquid Glass
 
-Variante d'interface inspirée du « Liquid Glass » d'Apple, à comparer avec la version Material 3 de
-`main`. Pas de bibliothèque : tout est du CSS au début de `index.html`. Les surfaces (carte du tirage,
+Interface inspirée du « Liquid Glass » d'Apple. La version Material 3 (Material You, police Roboto)
+est conservée dans la branche `design/material`. Pas de bibliothèque : tout est du CSS au début de
+`index.html`. Les surfaces (carte du tirage,
 liste, barre de recherche, barre de filtres, fiche) sont du verre : fond translucide, flou et saturation de
 ce qui passe derrière (`backdrop-filter`), liseré lumineux plus clair en haut, reflet spéculaire, ombre
 douce. Un fond de grandes taches de couleur floues, qui dérivent lentement, donne de la matière à
@@ -49,7 +50,7 @@ automatiquement dans Firebase.
 L'appli est une PWA : `manifest.webmanifest` (nom, icônes, mode plein écran) et
 `sw.js` (service worker) la rendent installable (« Ajouter à l'écran d'accueil » /
 « Installer l'application ») et utilisable hors-ligne. Les icônes (Calcifer) sont dans
-`assets/icons/`. Le service worker met en cache l'appli, les affiches, la police et le SDK
+`assets/icons/`. Le service worker met en cache l'appli, les affiches et le SDK
 Firebase ; les fichiers de l'appli sont lus en priorité sur le réseau, donc une mise à jour
 poussée sur GitHub est visible dès la visite suivante. Si tu ajoutes un fichier à l'appli,
 ajoute-le à la liste `SHELL` de `sw.js` (et change `VERSION` pour repartir d'un cache propre).
