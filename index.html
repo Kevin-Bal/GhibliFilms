@@ -7,73 +7,57 @@
 <meta name="description" content="Suivi des films Ghibli vus / pas vus, tirage au sort, notes et liste à regarder.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f5fbf5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1511" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#cde6fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07161e" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ghibli">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ===== Material Design 3 =====
-   Couleurs : rôles M3 générés par @material/material-color-utilities (graine #3f8f6b, vert Ghibli ;
-   tertiaire = ambre de Calcifer). light-dark(clair, sombre) suit le thème du système, ou
-   <html data-theme="light|dark"> pour le forcer. */
+/* ===== Liquid Glass =====
+   Verre translucide qui floute et sature ce qui passe derrière (backdrop-filter), liseré lumineux sur les bords,
+   reflet spéculaire, ombres douces, formes en capsule et mouvement fluide (ressorts). Le fond lumineux (.bg) donne
+   de la matière à « réfracter ». light-dark(clair, sombre) suit le thème du système, ou <html data-theme="light|dark">. */
 :root{
   color-scheme:light dark;
-  --md-primary:light-dark(#226a4c,#8ed5b0);
-  --md-on-primary:light-dark(#ffffff,#003824);
-  --md-primary-container:light-dark(#aaf2cb,#005236);
-  --md-on-primary-container:light-dark(#005236,#aaf2cb);
-  --md-secondary:light-dark(#4d6357,#b4ccbd);
-  --md-on-secondary:light-dark(#ffffff,#20352a);
-  --md-secondary-container:light-dark(#d0e8d8,#364b3f);
-  --md-on-secondary-container:light-dark(#364b3f,#d0e8d8);
-  --md-tertiary:light-dark(#7c5800,#f8bd49);
-  --md-on-tertiary:light-dark(#ffffff,#422d00);
-  --md-tertiary-container:light-dark(#ffdea8,#5e4200);
-  --md-on-tertiary-container:light-dark(#271900,#ffdea8);
-  --md-error:light-dark(#ba1a1a,#ffb4ab);
-  --md-on-error:light-dark(#ffffff,#690005);
-  --md-error-container:light-dark(#ffdad6,#93000a);
-  --md-on-error-container:light-dark(#93000a,#ffdad6);
-  --md-surface:light-dark(#f5fbf5,#0f1511);
-  --md-on-surface:light-dark(#171d19,#dee4de);
-  --md-surface-variant:light-dark(#dce5dd,#404943);
-  --md-on-surface-variant:light-dark(#404943,#c0c9c1);
-  --md-outline:light-dark(#707973,#8a938c);
-  --md-outline-variant:light-dark(#c0c9c1,#404943);
-  --md-surface-container-lowest:light-dark(#ffffff,#0a0f0c);
-  --md-surface-container-low:light-dark(#f0f5ef,#171d19);
-  --md-surface-container:light-dark(#eaefe9,#1b211d);
-  --md-surface-container-high:light-dark(#e4eae4,#262b28);
-  --md-surface-container-highest:light-dark(#dee4de,#303632);
-  --md-inverse-surface:light-dark(#2c322e,#dee4de);
-  --md-inverse-on-surface:light-dark(#edf2ec,#2c322e);
-  --md-inverse-primary:light-dark(#8ed5b0,#226a4c);
-  /* formes */
-  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:28px;
-  /* élévation : ombres M3 niveaux 1 et 3 */
-  --e1:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);
-  --e3:0 1px 3px rgba(0,0,0,.3),0 4px 8px 3px rgba(0,0,0,.15);
+  --ink:light-dark(#0f2530,#eaf5f3);
+  --ink-2:light-dark(rgba(15,37,48,.68),rgba(234,245,243,.70));
+  --ink-3:light-dark(rgba(15,37,48,.45),rgba(234,245,243,.45));
+  --glass:light-dark(rgba(255,255,255,.38),rgba(36,56,62,.38));
+  --glass-2:light-dark(rgba(255,255,255,.56),rgba(46,68,75,.52));
+  --glass-hover:light-dark(rgba(255,255,255,.62),rgba(255,255,255,.13));
+  --solid:light-dark(rgba(246,251,253,.96),rgba(22,36,41,.96));
+  --rim:light-dark(rgba(255,255,255,.80),rgba(255,255,255,.20));
+  --rim-hi:light-dark(rgba(255,255,255,1),rgba(255,255,255,.36));
+  --rim-lo:light-dark(rgba(255,255,255,.40),rgba(255,255,255,.07));
+  --sep:light-dark(rgba(15,37,48,.09),rgba(255,255,255,.10));
+  --shadow:light-dark(rgba(24,64,88,.18),rgba(0,0,0,.45));
+  --shadow-sm:light-dark(rgba(24,64,88,.10),rgba(0,0,0,.25));
+  --tint:light-dark(#139b72,#48d8a6);
+  --tint-ink:light-dark(#ffffff,#032a1d);
+  --warm:light-dark(#f2a01c,#ffc65e);
+  --warm-ink:#3b2300;
+  --danger:light-dark(#d23b3b,#ff8d83);
+  --bg-a:light-dark(#cde6fa,#07161e);
+  --bg-b:light-dark(#e6f7ec,#0c2829);
+  --blob-o:light-dark(.62,.27);
+  --track:light-dark(rgba(15,37,48,.11),rgba(255,255,255,.14));
+  --blur:26px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Rounded","SF Pro Display","Segoe UI Variable Display","Segoe UI",Roboto,system-ui,sans-serif;
+  --gutter:16px;
   --ease:cubic-bezier(.2,0,0,1);
-  /* mouvement M3 expressif : ressorts spatiaux (avec rebond) et d'effets (sans rebond).
-     Durées = temps de stabilisation du ressort ; courbes linear() ci-dessous, repli en Bézier. */
+  /* mouvement : ressorts spatiaux (avec rebond) et d'effets (sans rebond) — durées = temps de stabilisation */
   --sp-fast-d:.35s;--sp-d:.42s;--sp-slow-d:.57s;--fx-fast-d:.14s;--fx-d:.22s;--fx-slow-d:.3s;
   --sp-fast:cubic-bezier(.34,1.45,.64,1);--sp:cubic-bezier(.2,0,0,1);--sp-slow:cubic-bezier(.2,0,0,1);
   --fx-fast:cubic-bezier(.2,0,0,1);--fx:cubic-bezier(.2,0,0,1);--fx-slow:cubic-bezier(.2,0,0,1);
-  --font:Roboto,"Google Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --gutter:16px;
   --ic-check:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
 }
 :root[data-theme="light"]{color-scheme:light}
 :root[data-theme="dark"]{color-scheme:dark}
 @media (min-width:640px){:root{--gutter:24px}}
-/* ressorts M3 (Compose MotionScheme.expressive : rapide 800/0,6 · défaut 380/0,8 · lent 200/0,8 ; effets 3800 · 1600 · 800, amortissement 1) */
+/* ressorts (valeurs de Compose MotionScheme.expressive : rapide 800/0,6 · défaut 380/0,8 · lent 200/0,8 ; effets 3800 · 1600 · 800, amortissement 1) */
 @supports (transition-timing-function:linear(0,1)){:root{
   --sp-fast:linear(0,0.034,0.12,0.238,0.372,0.508,0.638,0.754,0.853,0.934,0.997,1.042,1.071,1.088,1.094,1.093,1.086,1.076,1.063,1.05,1.038,1.026,1.016,1.008,1.002,0.997,0.994,0.992,0.991,0.991,0.992,0.993,0.994,0.995,0.996,0.997,1);
   --sp:linear(0,0.023,0.081,0.161,0.253,0.349,0.444,0.534,0.616,0.69,0.755,0.811,0.858,0.896,0.928,0.953,0.972,0.987,0.997,1.005,1.01,1.013,1.015,1.015,1.015,1.014,1.013,1.011,1.01,1.008,1.007,1.006,1.005,1.004,1.003,1.002,1);
@@ -85,42 +69,55 @@
 
 html{height:100%;-webkit-text-size-adjust:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;min-height:100%;background:var(--md-surface);color:var(--md-on-surface);
-  font:400 1rem/1.5 var(--font);letter-spacing:.01em;-webkit-font-smoothing:antialiased;
+body{margin:0;min-height:100%;background:var(--bg-a);color:var(--ink);
+  font:400 1rem/1.5 var(--font);-webkit-font-smoothing:antialiased;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
 button,input,select{font:inherit;letter-spacing:inherit;color:inherit}
 button{touch-action:manipulation}
-.wrap{max-width:880px;margin:0 auto;padding:24px var(--gutter) 56px}
-h1{display:flex;align-items:center;gap:14px;margin:0 0 4px;font-size:clamp(1.75rem,5.5vw,2.25rem);line-height:1.2;font-weight:500;letter-spacing:0}
-.sub{margin:0 0 24px;color:var(--md-on-surface-variant)}
-:focus-visible{outline:3px solid var(--md-secondary);outline-offset:2px}
+.wrap{max-width:880px;margin:0 auto;padding:28px var(--gutter) calc(120px + env(safe-area-inset-bottom,0px))}
+h1{display:flex;align-items:center;gap:14px;margin:0 0 6px;font-size:clamp(2rem,7.5vw,2.9rem);line-height:1.1;font-weight:700;letter-spacing:-.025em}
+.sub{margin:0 0 26px;color:var(--ink-2);font-size:1.0625rem}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--tint) 75%,transparent);outline-offset:3px}
 
-/* ----- état des composants : couche d'état (survol 8 %, focus/appui 10 %) + ondulation ----- */
-.btn,.btn-draw,.tab,.status,.pin,.icon-btn{position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
-.btn::after,.btn-draw::after,.tab::after,.status::after,.pin::after,.icon-btn::after{content:"";position:absolute;inset:0;border-radius:inherit;background:currentColor;opacity:0;transition:opacity .15s;pointer-events:none}
-@media (hover:hover){
-  .btn:hover::after,.btn-draw:hover::after,.tab:hover::after,.status:hover::after,.pin:hover::after,.icon-btn:hover::after{opacity:.08}
+/* ----- fond lumineux : de grandes taches de couleur floues, qui dérivent lentement ----- */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:linear-gradient(175deg,var(--bg-a),var(--bg-b))}
+.bg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:var(--blob-o);will-change:transform;animation:drift 28s ease-in-out infinite alternate}
+.bg i:nth-child(1){width:52vmax;height:52vmax;left:-16vmax;top:-14vmax;background:#62b8ff}
+.bg i:nth-child(2){width:42vmax;height:42vmax;right:-14vmax;top:22vh;background:#4fe0ae;animation-duration:34s;animation-delay:-9s}
+.bg i:nth-child(3){width:38vmax;height:38vmax;left:12vw;bottom:-18vmax;background:#ffc062;animation-duration:40s;animation-delay:-17s}
+.bg i:nth-child(4){width:30vmax;height:30vmax;right:8vw;top:-10vmax;background:#ff9fc6;animation-duration:46s;animation-delay:-25s}
+@keyframes drift{to{transform:translate3d(7vmax,5vmax,0) scale(1.14)}}
+
+/* ----- matière « verre » : flou + saturation, liseré lumineux (haut plus clair), ombre portée ----- */
+.draw,.tablewrap,.searchbar,.tabs,dialog{
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(1.8);backdrop-filter:blur(var(--blur)) saturate(1.8);
+  box-shadow:inset 0 0 0 1px var(--rim),inset 0 2px 1px -1px var(--rim-hi),inset 0 -2px 1px -1px var(--rim-lo),0 14px 38px var(--shadow),0 2px 8px var(--shadow-sm);
 }
-.btn:focus-visible::after,.btn-draw:focus-visible::after,.tab:focus-visible::after,.status:focus-visible::after,.pin:focus-visible::after,.icon-btn:focus-visible::after,
-.btn:active::after,.btn-draw:active::after,.tab:active::after,.status:active::after,.pin:active::after,.icon-btn:active::after{opacity:.1}
-.ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;transform:scale(0);animation:ripple .55s var(--ease) forwards}
-@keyframes ripple{from{opacity:.14;transform:scale(0)}to{opacity:0;transform:scale(1)}}
+.searchbar,.tabs,dialog{background:var(--glass-2)}
+/* reflet spéculaire en haut à gauche + éclat discret en bas à droite */
+.draw,.tablewrap{position:relative}
+.draw,.tablewrap,dialog{isolation:isolate}
+.draw::before,.tablewrap::before,dialog::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(120% 60% at 10% -12%,light-dark(rgba(255,255,255,.70),rgba(255,255,255,.14)),transparent 58%),
+    linear-gradient(160deg,transparent 62%,light-dark(rgba(255,255,255,.30),rgba(255,255,255,.05)))}
 
-/* ----- mouvement : les formes se déforment à l'appui (M3 expressif) et reviennent avec un ressort ----- */
-.btn,.btn-draw,.tab,.status{transition:border-radius var(--sp-fast-d) var(--sp-fast),transform var(--sp-fast-d) var(--sp-fast),background-color var(--fx-d) var(--fx),color var(--fx-d) var(--fx),border-color var(--fx-d) var(--fx),box-shadow var(--fx-d) var(--fx)}
+/* ----- interactions : la matière réagit (grossit, s'éclaire) ; ondulation = lueur sous le doigt ----- */
+.btn,.btn-draw,.tab,.status,.pin,.icon-btn{position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.ripple{position:absolute;border-radius:50%;pointer-events:none;transform:scale(0);background:radial-gradient(circle,rgba(255,255,255,.75),rgba(255,255,255,0) 68%);animation:ripple .6s var(--ease) forwards}
+@keyframes ripple{from{opacity:.9;transform:scale(0)}to{opacity:0;transform:scale(1)}}
+.btn,.btn-draw,.tab,.status{transition:transform var(--sp-fast-d) var(--sp-fast),background-color var(--fx-d) var(--fx),color var(--fx-d) var(--fx),box-shadow var(--fx-d) var(--fx)}
 .pin{transition:transform var(--sp-fast-d) var(--sp-fast),color var(--fx-d) var(--fx)}
-.btn:active{border-radius:var(--r-md);transform:scale(.97)}
-.btn-draw:active{border-radius:28px;transform:scale(.97)}
-.tab:active,.status:active{border-radius:16px;transform:scale(.95)}
-.pin:active{transform:scale(.82)}
-@media (hover:hover){.btn-draw:hover:not(:disabled){box-shadow:0 2px 3px rgba(0,0,0,.3),0 6px 10px 4px rgba(0,0,0,.15)}}
+.btn:active,.btn-draw:active,.status:active{transform:scale(1.05)}
+.tab:active{transform:scale(1.08)}
+.pin:active{transform:scale(1.3)}
 
 /* entrée de page : les blocs montent en cascade ; la liste s'anime en JS (apparition + déplacement) */
 .wrap>:not(dialog):not(.tablewrap){animation:rise var(--sp-d) var(--sp) backwards;animation-delay:calc(var(--i,0)*45ms)}
 .wrap>:nth-child(2){--i:1}.wrap>:nth-child(3){--i:2}.wrap>:nth-child(4){--i:3}.wrap>:nth-child(5){--i:4}.wrap>:nth-child(6){--i:5}.wrap>:nth-child(7){--i:6}.wrap>:nth-child(10){--i:8}
 @keyframes rise{from{opacity:0;transform:translateY(24px)}}
-/* Calcifer du titre : la flamme respire */
-h1 .calc{animation:flicker 3.8s ease-in-out infinite}
+/* Calcifer du titre : la flamme respire, avec une lueur */
+h1 .calc{--s:50px;box-shadow:0 0 30px rgba(255,150,40,.6),0 0 0 2px var(--rim);animation:flicker 3.8s ease-in-out infinite}
 @keyframes flicker{
   0%,100%{transform:scale(1);filter:saturate(1.6) brightness(1)}
   18%{transform:scale(1.05,.97);filter:saturate(1.7) brightness(1.12)}
@@ -134,136 +131,148 @@ tr.just .poster{animation:pickPop var(--sp-fast-d) var(--sp-fast)}
 @keyframes pickIn{from{background-color:transparent}}
 @keyframes pickPop{from{transform:scale(.8) rotate(-5deg)}}
 
-/* ----- tirage : carte + FAB étendu ----- */
-.draw{background:var(--md-surface-container);border-radius:var(--r-xl);padding:24px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+/* ----- tirage ----- */
+.draw{border-radius:34px;padding:26px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:26px}
 .draw-main{flex:1 1 270px;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
-.btn-draw{display:inline-flex;align-items:center;justify-content:center;gap:12px;height:56px;padding:0 24px 0 20px;border:0;border-radius:var(--r-lg);
-  background:var(--md-tertiary-container);color:var(--md-on-tertiary-container);font-weight:500;font-size:1rem;letter-spacing:.01em;cursor:pointer;box-shadow:var(--e3)}
+/* bouton principal : verre teinté ambre, qui rayonne */
+.btn-draw{display:inline-flex;align-items:center;justify-content:center;gap:12px;height:58px;padding:0 26px 0 22px;border:0;border-radius:29px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--warm) 88%,#fff),var(--warm));color:var(--warm-ink);font-weight:700;font-size:1.0625rem;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),inset 0 2px 1px -1px #fff,inset 0 -3px 6px -2px rgba(160,90,0,.35),0 10px 28px color-mix(in srgb,var(--warm) 55%,transparent),0 2px 6px rgba(120,70,0,.25)}
 .btn-draw svg{width:24px;height:24px;flex:none}
-.btn-draw:disabled{background:color-mix(in srgb,var(--md-on-surface) 12%,transparent);color:color-mix(in srgb,var(--md-on-surface) 38%,transparent);box-shadow:none;cursor:not-allowed}
-.count{margin:0;color:var(--md-on-surface-variant);font-size:.875rem;line-height:1.43}
-.result{display:flex;gap:16px;align-items:center;flex:2 1 300px;min-width:0;background:var(--md-surface-container-highest);border-radius:20px;padding:16px}
+.btn-draw:disabled{background:var(--glass);color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--rim);cursor:not-allowed}
+@media (hover:hover){.btn-draw:hover:not(:disabled){transform:translateY(-2px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),inset 0 2px 1px -1px #fff,inset 0 -3px 6px -2px rgba(160,90,0,.35),0 16px 36px color-mix(in srgb,var(--warm) 65%,transparent),0 2px 6px rgba(120,70,0,.25)}}
+.count{margin:0;color:var(--ink-2);font-size:.9375rem}
+.result{display:flex;gap:16px;align-items:center;flex:2 1 300px;min-width:0;background:var(--glass-hover);border-radius:26px;padding:16px;box-shadow:inset 0 0 0 1px var(--rim),inset 0 2px 1px -1px var(--rim-hi)}
 .result[hidden]{display:none}
-.result .poster{width:78px;height:110px;flex:none;border-radius:var(--r-md)}
-.result h2{margin:0;font-size:1.375rem;line-height:1.27;font-weight:400;letter-spacing:0;overflow-wrap:anywhere}
-.result .meta{color:var(--md-on-surface-variant);margin:4px 0 12px;font-size:.875rem;line-height:1.43}
+.result .poster{width:78px;height:110px;flex:none;border-radius:14px}
+.result h2{margin:0;font-size:1.375rem;line-height:1.25;font-weight:700;letter-spacing:-.01em;overflow-wrap:anywhere}
+.result .meta{color:var(--ink-2);margin:4px 0 12px;font-size:.9rem}
 .result .actions{display:flex;gap:8px;flex-wrap:wrap}
 .rolling h2{opacity:.55}
 
 .dirsel{display:block;width:100%;max-width:340px}
-.dirsel label{display:block;font-size:.75rem;font-weight:500;line-height:1.33;color:var(--md-on-surface-variant);margin:0 0 6px 4px}
-.dirsel select{display:block;width:100%;height:56px;padding:0 12px;border:1px solid var(--md-outline);border-radius:var(--r-md);background:transparent;color:var(--md-on-surface)}
-.dirsel select:hover{border-color:var(--md-on-surface)}
-.dirsel select:focus{outline:0;border:2px solid var(--md-primary);padding:0 11px}
-.dirsel option{background:var(--md-surface-container-high);color:var(--md-on-surface)}
+.dirsel label{display:block;font-size:.8125rem;font-weight:600;color:var(--ink-2);margin:0 0 6px 14px}
+.dirsel select{display:block;width:100%;height:50px;padding:0 16px;border:0;border-radius:25px;background:var(--glass-hover);color:var(--ink);box-shadow:inset 0 0 0 1px var(--rim),inset 0 2px 1px -1px var(--rim-hi)}
+.dirsel select:focus{outline:3px solid color-mix(in srgb,var(--tint) 75%,transparent);outline-offset:2px}
+.dirsel option{background:var(--solid);color:var(--ink)}
 
-/* interrupteur M3 */
-.onlylist{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;max-width:340px;min-height:48px;cursor:pointer;font-size:1rem;line-height:1.5}
-.switch{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:52px;height:32px;margin:0;border-radius:16px;border:2px solid var(--md-outline);background:var(--md-surface-container-highest);cursor:pointer;transition:background-color var(--fx-d) var(--fx),border-color var(--fx-d) var(--fx)}
-.switch::before{content:"";position:absolute;top:50%;left:6px;width:16px;height:16px;border-radius:50%;background:var(--md-outline);transform:translateY(-50%);transition:left var(--sp-fast-d) var(--sp-fast),width var(--sp-fast-d) var(--sp-fast),height var(--sp-fast-d) var(--sp-fast),background-color var(--fx-d) var(--fx)}
-.switch:checked{background:var(--md-primary);border-color:var(--md-primary)}
-.switch:checked::before{left:22px;width:24px;height:24px;background:var(--md-on-primary)}
-.switch:active::before{width:28px;height:28px;left:4px}
-.switch:checked:active::before{left:18px}
+/* interrupteur : piste verte, poignée en verre qui s'étire quand on appuie */
+.onlylist{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;max-width:340px;min-height:48px;cursor:pointer;font-weight:500}
+.switch{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:58px;height:34px;margin:0;border:0;border-radius:17px;cursor:pointer;
+  background:light-dark(rgba(110,125,135,.34),rgba(255,255,255,.18));box-shadow:inset 0 1px 3px rgba(0,0,0,.18),inset 0 0 0 1px var(--rim-lo);transition:background-color var(--fx-d) var(--fx)}
+.switch::before{content:"";position:absolute;top:3px;left:3px;width:30px;height:28px;border-radius:14px;background:linear-gradient(180deg,#fff,#eef3f5);
+  box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 0 0 1px rgba(255,255,255,.9);transition:left var(--sp-fast-d) var(--sp-fast),width var(--sp-fast-d) var(--sp-fast)}
+.switch:checked{background:var(--tint)}
+.switch:checked::before{left:25px}
+.switch:active::before{width:38px}
+.switch:checked:active::before{left:17px}
 
-/* ----- barre de recherche M3 ----- */
-.searchbar{position:relative;display:flex;align-items:center;height:56px;margin:0 0 16px;border-radius:999px;background:var(--md-surface-container-high);color:var(--md-on-surface-variant)}
-.searchbar:focus-within{box-shadow:inset 0 0 0 2px var(--md-primary)}
-.searchbar>svg{position:absolute;left:16px;width:24px;height:24px;pointer-events:none}
-.search{flex:1;min-width:0;height:100%;padding:0 56px 0 56px;border:0;border-radius:999px;background:transparent;color:var(--md-on-surface);font-size:1rem;outline:0;-webkit-appearance:none;appearance:none}
-.search::placeholder{color:var(--md-on-surface-variant);opacity:1}
+/* ----- barre de recherche : capsule en verre, collée en haut pendant le défilement ----- */
+.searchbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:20;display:flex;align-items:center;height:54px;margin:0 0 18px;border-radius:27px;color:var(--ink-2)}
+.searchbar>svg{position:absolute;left:18px;width:22px;height:22px;pointer-events:none}
+.search{flex:1;min-width:0;height:100%;padding:0 54px 0 52px;border:0;border-radius:27px;background:transparent;color:var(--ink);font-size:1.0625rem;outline:0;-webkit-appearance:none;appearance:none}
+.search::placeholder{color:var(--ink-2);opacity:1}
 .search::-webkit-search-cancel-button,.search::-webkit-search-decoration{-webkit-appearance:none;display:none}
-.icon-btn{position:absolute;right:4px;top:4px;display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--md-on-surface-variant);cursor:pointer}
-/* la croix d'effacement apparaît / disparaît en grossissant */
+.searchbar:focus-within{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--tint) 80%,transparent),inset 0 2px 1px -1px var(--rim-hi),0 14px 38px var(--shadow),0 0 0 4px color-mix(in srgb,var(--tint) 22%,transparent)}
+.icon-btn{position:absolute;right:9px;top:9px;display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:var(--glass-hover);color:var(--ink-2);cursor:pointer;box-shadow:inset 0 0 0 1px var(--rim)}
+.icon-btn svg{width:20px;height:20px}
 .icon-btn{transition:opacity var(--fx-d) var(--fx),transform var(--sp-fast-d) var(--sp-fast),display var(--fx-d) allow-discrete}
-.icon-btn:active{transform:scale(.82)}
+.icon-btn:active{transform:scale(.85)}
 .icon-btn[hidden]{display:none;opacity:0;transform:scale(.5)}
 @starting-style{.icon-btn{opacity:0;transform:scale(.5)}}
-.icon-btn svg{width:24px;height:24px}
 
-/* ----- puces de filtre M3 ----- */
-.tabs{display:flex;gap:8px;overflow-x:auto;padding:6px var(--gutter);margin:-6px calc(var(--gutter)*-1) 0;scrollbar-width:none}
+/* ----- filtres : barre flottante en bas, avec un indicateur en verre qui glisse d'un onglet à l'autre ----- */
+.tabs{position:fixed;left:0;right:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));margin-inline:auto;z-index:30;width:max-content;max-width:calc(100% - 24px);
+  display:flex;gap:2px;padding:5px;border-radius:999px;overflow-x:auto;scrollbar-width:none;
+  box-shadow:inset 0 0 0 1px var(--rim),inset 0 2px 1px -1px var(--rim-hi),inset 0 -2px 1px -1px var(--rim-lo),0 18px 44px var(--shadow),0 3px 10px var(--shadow-sm)}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 16px;border:1px solid var(--md-outline);border-radius:var(--r-sm);background:transparent;color:var(--md-on-surface-variant);font-weight:500;font-size:.875rem;line-height:1.43;letter-spacing:.01em;cursor:pointer;white-space:nowrap}
-/* la coche se déploie quand la puce est sélectionnée */
-.tab{transition-property:border-radius,transform,background-color,color,border-color,box-shadow,padding}
-.tab::before{content:"";flex:none;width:0;height:18px;margin-right:-8px;opacity:0;background:currentColor;-webkit-mask:var(--ic-check) center/contain no-repeat;mask:var(--ic-check) center/contain no-repeat;transition:width var(--sp-fast-d) var(--sp-fast),margin var(--sp-fast-d) var(--sp-fast),opacity var(--fx-d) var(--fx)}
-.tab[aria-pressed="true"]{padding-left:8px;border-color:transparent;background:var(--md-secondary-container);color:var(--md-on-secondary-container)}
-.tab[aria-pressed="true"]::before{width:18px;margin-right:0;opacity:1}
-.progress{margin:20px 4px 8px;font-size:.875rem;line-height:1.43;color:var(--md-on-surface-variant)}
-.meter{height:8px;background:var(--md-secondary-container);border-radius:99px;overflow:hidden;margin-bottom:16px}
-.meter i{display:block;height:100%;background:var(--md-primary);border-radius:99px;width:0;transition:width var(--sp-slow-d) var(--sp-slow)}
+.ind{position:absolute;z-index:0;top:5px;left:0;height:calc(100% - 10px);width:var(--w,0px);transform:translateX(var(--x,0px));border-radius:999px;pointer-events:none;
+  background:light-dark(rgba(255,255,255,.82),rgba(255,255,255,.20));
+  box-shadow:inset 0 0 0 1px var(--rim),inset 0 2px 1px -1px var(--rim-hi),0 6px 16px var(--shadow)}
+.tabs.ready .ind{transition:transform var(--sp-fast-d) var(--sp-fast),width var(--sp-fast-d) var(--sp-fast)}
+.tab{position:relative;z-index:1;flex:none;display:inline-flex;align-items:center;height:42px;padding:0 17px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-weight:600;font-size:.9375rem;white-space:nowrap;cursor:pointer}
+.tab[aria-pressed="true"]{color:var(--ink)}
+@media (hover:hover){.tab:not([aria-pressed="true"]):hover{color:var(--ink)}}
+.progress{margin:6px 8px 8px;font-size:.9375rem;font-weight:600;color:var(--ink-2)}
+.meter{height:9px;background:var(--track);border-radius:99px;overflow:hidden;margin-bottom:18px;box-shadow:inset 0 1px 2px rgba(0,0,0,.14)}
+.meter i{display:block;height:100%;border-radius:99px;width:0;background:linear-gradient(90deg,var(--tint),color-mix(in srgb,var(--tint) 55%,#6cc7ff));box-shadow:0 0 14px color-mix(in srgb,var(--tint) 65%,transparent);transition:width var(--sp-slow-d) var(--sp-slow)}
 
-/* ----- liste (tableau) ----- */
-.tablewrap{overflow-x:auto;background:var(--md-surface-container-low);border-radius:var(--r-xl)}
+/* ----- liste ----- */
+.tablewrap{overflow:hidden;border-radius:34px}
 table{border-collapse:collapse;width:100%;min-width:560px}
-th{text-align:left;font-size:.875rem;line-height:1.43;font-weight:500;color:var(--md-on-surface-variant);padding:16px 12px;border-bottom:1px solid var(--md-outline-variant);white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid var(--md-outline-variant);vertical-align:middle}
-th:first-child,td:first-child{padding-left:20px}
-th:last-child,td:last-child{padding-right:20px}
+th{text-align:left;font-size:.75rem;line-height:1.4;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);padding:18px 12px 14px;border-bottom:1px solid var(--sep);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--sep);vertical-align:middle}
+th:first-child,td:first-child{padding-left:22px}
+th:last-child,td:last-child{padding-right:22px}
 tr:last-child td{border-bottom:0}
 tbody tr{cursor:pointer}
-@media (hover:hover){tbody tr:hover td{background:color-mix(in srgb,var(--md-on-surface) 8%,transparent)}}
-tr.picked td{background:color-mix(in srgb,var(--md-tertiary-container) 70%,transparent)}
-td.t{font-weight:500}
-td.t small{display:block;font-weight:400;font-size:.875rem;line-height:1.43;color:var(--md-on-surface-variant)}
-td.y,td.d{white-space:nowrap;font-size:.875rem;color:var(--md-on-surface-variant)}
-.poster{width:44px;height:62px;border-radius:var(--r-sm);overflow:hidden;position:relative;display:flex;align-items:flex-end;justify-content:center;background-size:cover;background-position:center;padding:0;font:inherit}
+@media (hover:hover){tbody tr:hover td{background:var(--glass-hover)}}
+tr.picked td{background:color-mix(in srgb,var(--warm) 26%,transparent)}
+td.t{font-weight:600}
+td.t small{display:block;font-weight:400;font-size:.875rem;color:var(--ink-2)}
+td.y,td.d{white-space:nowrap;font-size:.9375rem;color:var(--ink-2)}
+.poster{width:44px;height:62px;border-radius:10px;overflow:hidden;position:relative;display:flex;align-items:flex-end;justify-content:center;background-size:cover;background-position:center;padding:0;font:inherit;
+  box-shadow:0 6px 14px var(--shadow),inset 0 0 0 1px rgba(255,255,255,.4)}
 .poster span{font-size:.625rem;font-weight:700;color:#fff;text-align:center;line-height:1.1;padding:3px 2px;text-shadow:0 1px 2px rgba(0,0,0,.55);width:100%;background:linear-gradient(transparent,rgba(0,0,0,.45))}
 .poster.img span{display:none}
-.title-btn{font:inherit;font-weight:500;text-align:left;background:none;border:0;padding:0;color:inherit;cursor:pointer}
-.empty{text-align:center;color:var(--md-on-surface-variant);padding:24px 16px}
+.title-btn{font:inherit;font-weight:600;text-align:left;background:none;border:0;padding:0;color:inherit;cursor:pointer}
+.empty{text-align:center;color:var(--ink-2);padding:26px 16px}
 
-/* puce Vu / Pas vu (puce de filtre : sélectionnée = tonale avec coche) */
-.status{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--md-outline);border-radius:var(--r-sm);background:transparent;color:var(--md-on-surface-variant);font-weight:500;font-size:.875rem;line-height:1.43;letter-spacing:.01em;white-space:nowrap;cursor:pointer}
-.status.seen{padding-left:8px;border-color:transparent;background:var(--md-secondary-container);color:var(--md-on-secondary-container)}
-.status.seen::before{content:"";width:18px;height:18px;background:currentColor;-webkit-mask:var(--ic-check) center/contain no-repeat;mask:var(--ic-check) center/contain no-repeat}
-/* bouton-icône à bascule : étoile « ma liste » */
-.pin{display:inline-grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--md-on-surface-variant);cursor:pointer}
+/* pastille Vu / Pas vu : « Vu » est du verre teinté de vert, avec une coche */
+.status{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border:0;border-radius:16px;background:light-dark(rgba(255,255,255,.55),rgba(255,255,255,.10));color:var(--ink-2);font-weight:600;font-size:.875rem;white-space:nowrap;cursor:pointer;
+  box-shadow:inset 0 0 0 1px var(--rim),inset 0 2px 1px -1px var(--rim-hi)}
+.status.seen{padding-left:10px;background:linear-gradient(180deg,color-mix(in srgb,var(--tint) 88%,#fff),var(--tint));color:var(--tint-ink);box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 2px 1px -1px rgba(255,255,255,.8),0 4px 12px color-mix(in srgb,var(--tint) 40%,transparent)}
+.status.seen::before{content:"";width:16px;height:16px;background:currentColor;-webkit-mask:var(--ic-check) center/contain no-repeat;mask:var(--ic-check) center/contain no-repeat}
+.pin{display:inline-grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--ink-3);cursor:pointer}
 .pin svg{width:24px;height:24px}
-.pin.on{color:var(--md-tertiary)}
-.note{font-weight:500;white-space:nowrap}
-.note small{font-weight:400;color:var(--md-on-surface-variant)}
+.pin.on{color:var(--warm)}
+.pin.on svg{filter:drop-shadow(0 0 7px color-mix(in srgb,var(--warm) 70%,transparent))}
+.note{font-weight:700;white-space:nowrap}
+.note small{font-weight:400;color:var(--ink-2)}
 
-/* boutons M3 : rempli, contour */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 24px;border:1px solid var(--md-outline);border-radius:20px;background:transparent;color:var(--md-primary);font-weight:500;font-size:.875rem;line-height:1.43;letter-spacing:.01em;white-space:nowrap;cursor:pointer}
-.btn svg{width:18px;height:18px;flex:none;margin-left:-8px}
-.btn.primary{border-color:transparent;background:var(--md-primary);color:var(--md-on-primary)}
-.btn.text{border-color:transparent;padding:0 12px}
+/* boutons : capsule en verre ; « primary » = verre teinté vert */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 24px;border:0;border-radius:23px;background:var(--glass-2);color:var(--ink);font-weight:600;font-size:.9375rem;white-space:nowrap;cursor:pointer;
+  -webkit-backdrop-filter:blur(16px) saturate(1.7);backdrop-filter:blur(16px) saturate(1.7);
+  box-shadow:inset 0 0 0 1px var(--rim),inset 0 2px 1px -1px var(--rim-hi),0 6px 18px var(--shadow-sm)}
+.btn svg{width:18px;height:18px;flex:none;margin-left:-6px}
+@media (hover:hover){.btn:hover{background:var(--glass-hover)}}
+.btn.primary{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(180deg,color-mix(in srgb,var(--tint) 86%,#fff),var(--tint));color:var(--tint-ink);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),inset 0 2px 1px -1px rgba(255,255,255,.85),inset 0 -3px 6px -2px rgba(0,60,40,.3),0 8px 22px color-mix(in srgb,var(--tint) 45%,transparent)}
+@media (hover:hover){.btn.primary:hover{filter:saturate(1.15) brightness(1.05)}}
+.btn.text{background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--ink-2);padding:0 14px}
+@media (hover:hover){.btn.text:hover{background:var(--glass-hover)}}
 
-/* ----- boîte de dialogue M3 (fiche d'un film) ----- */
-dialog{border:0;border-radius:var(--r-xl);padding:0;max-width:560px;width:calc(100% - 32px);max-height:calc(100% - 32px);overflow:auto;background:var(--md-surface-container-high);color:var(--md-on-surface);box-shadow:var(--e3)}
-/* ouverture : ressort (monte et se déploie) ; fermeture : sortie plus rapide, sans rebond. `display`/`overlay` en
-   allow-discrete gardent la boîte visible le temps de la transition (repli : apparition/disparition instantanée). */
-dialog{opacity:0;transform:translateY(32px) scale(.88);transition:opacity var(--fx-fast-d) linear,transform .2s cubic-bezier(.3,0,.8,.15),overlay .2s allow-discrete,display .2s allow-discrete}
+/* ----- fiche d'un film : feuille de verre ----- */
+dialog{--blur:40px;border:0;border-radius:38px;padding:0;max-width:560px;width:calc(100% - 28px);max-height:calc(100% - 28px);overflow:auto;color:var(--ink)}
+/* ouverture : ressort (monte et se déploie) ; fermeture : sortie plus rapide, sans rebond */
+dialog{opacity:0;transform:translateY(34px) scale(.9);transition:opacity var(--fx-fast-d) linear,transform .2s cubic-bezier(.3,0,.8,.15),overlay .2s allow-discrete,display .2s allow-discrete}
 dialog[open]{opacity:1;transform:none;transition:opacity var(--fx-d) linear,transform var(--sp-d) var(--sp),overlay var(--sp-d) allow-discrete,display var(--sp-d) allow-discrete}
-@starting-style{dialog[open]{opacity:0;transform:translateY(32px) scale(.88)}}
-dialog::backdrop{background:rgba(0,0,0,0);transition:background-color .2s linear,overlay .2s allow-discrete,display .2s allow-discrete}
-dialog[open]::backdrop{background:rgba(0,0,0,.32);transition-duration:var(--sp-d),var(--sp-d),var(--sp-d)}
-@starting-style{dialog[open]::backdrop{background:rgba(0,0,0,0)}}
-.fiche{display:flex;gap:20px;padding:24px 24px 0;flex-wrap:wrap}
-.fiche .poster{width:120px;height:170px;flex:none;border-radius:var(--r-md)}
+@starting-style{dialog[open]{opacity:0;transform:translateY(34px) scale(.9)}}
+dialog::backdrop{background:light-dark(rgba(170,200,225,0),rgba(0,10,16,0));-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);transition:background-color .2s linear,backdrop-filter .2s linear,overlay .2s allow-discrete,display .2s allow-discrete}
+dialog[open]::backdrop{background:light-dark(rgba(170,200,225,.34),rgba(0,10,16,.46));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition-duration:var(--sp-d),var(--sp-d),var(--sp-d),var(--sp-d)}
+@starting-style{dialog[open]::backdrop{background:light-dark(rgba(170,200,225,0),rgba(0,10,16,0));-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0)}}
+.fiche{display:flex;gap:20px;padding:26px 26px 0;flex-wrap:wrap}
+.fiche .poster{width:120px;height:170px;flex:none;border-radius:16px}
 .fiche-body{flex:1 1 220px;min-width:0}
-.fiche h2{margin:0;font-size:1.5rem;line-height:1.33;font-weight:400;letter-spacing:0}
-.fiche .meta{color:var(--md-on-surface-variant);margin:4px 0 12px;font-size:.875rem;line-height:1.43}
-.fiche p.syn{margin:0 0 16px;font-size:.875rem;line-height:1.43}
-.dialog-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:16px 24px 24px}
+.fiche h2{margin:0;font-size:1.6rem;line-height:1.2;font-weight:700;letter-spacing:-.02em}
+.fiche .meta{color:var(--ink-2);margin:5px 0 12px;font-size:.9rem}
+.fiche p.syn{margin:0 0 16px;font-size:.9375rem;line-height:1.5}
+.dialog-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:18px 26px 26px}
 .dialog-actions .fiche-close{order:-1;margin-right:auto}
 
-/* note : curseur à poignée verticale (M3 expressif). La piste en dégradé suit la couleur de Calcifer. */
-.rating-label{font-size:.875rem;font-weight:500;line-height:1.43;color:var(--md-on-surface-variant);margin:0 0 8px}
+/* note : curseur à poignée en verre (elle s'étire quand on la tient). La piste en dégradé suit la couleur de Calcifer. */
+.rating-label{font-size:.9rem;font-weight:600;color:var(--ink-2);margin:0 0 8px}
 .rate-row{display:flex;align-items:center;gap:16px;margin:0 0 4px}
 .rate-col{flex:1;min-width:0}
-.slider{-webkit-appearance:none;appearance:none;display:block;width:100%;height:16px;border-radius:8px;margin:16px 0;cursor:pointer;
-  background:linear-gradient(90deg,#3d63ff,#8a4dff,#d03cff,#ff3cb4,#ff2a3a);outline-offset:8px;touch-action:pan-y}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:content-box;width:6px;height:36px;border-radius:5px;background:var(--md-on-surface);border:4px solid var(--md-surface-container-high);transition:width var(--sp-fast-d) var(--sp-fast),height var(--sp-fast-d) var(--sp-fast)}
-.slider::-moz-range-thumb{box-sizing:content-box;width:6px;height:36px;border-radius:5px;background:var(--md-on-surface);border:4px solid var(--md-surface-container-high);transition:width var(--sp-fast-d) var(--sp-fast),height var(--sp-fast-d) var(--sp-fast)}
-/* la poignée s'affine quand on la tient (M3 expressif) */
-.slider:active::-webkit-slider-thumb{width:3px;height:42px}
-.slider:active::-moz-range-thumb{width:3px;height:42px}
+.slider{-webkit-appearance:none;appearance:none;display:block;width:100%;height:10px;border-radius:6px;margin:18px 0;cursor:pointer;
+  background:linear-gradient(90deg,#3d63ff,#8a4dff,#d03cff,#ff3cb4,#ff2a3a);box-shadow:inset 0 1px 2px rgba(0,0,0,.25);outline-offset:10px;touch-action:pan-y}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:content-box;width:34px;height:22px;border-radius:15px;background:linear-gradient(180deg,#fff,#eef3f6);border:3px solid rgba(255,255,255,.5);box-shadow:0 3px 12px rgba(0,0,0,.32);transition:width var(--sp-fast-d) var(--sp-fast)}
+.slider::-moz-range-thumb{box-sizing:content-box;width:34px;height:22px;border-radius:15px;background:linear-gradient(180deg,#fff,#eef3f6);border:3px solid rgba(255,255,255,.5);box-shadow:0 3px 12px rgba(0,0,0,.32);transition:width var(--sp-fast-d) var(--sp-fast)}
+.slider:active::-webkit-slider-thumb{width:48px}
+.slider:active::-moz-range-thumb{width:48px}
 .slider::-moz-range-track{background:transparent}
-.rating-val{font-size:1rem;font-weight:500;margin:0;min-height:1.5em}
-.rating-hint{font-size:.75rem;line-height:1.33;color:var(--md-on-surface-variant);margin:4px 0 16px}
+.rating-val{font-size:1.0625rem;font-weight:700;margin:0;min-height:1.5em}
+.rating-hint{font-size:.8125rem;color:var(--ink-2);margin:4px 0 16px}
 
 /* Calcifer : carré de 250 px de l'image (assets/calcifer.png, 447×447) centré sur le milieu des yeux (240, 182),
    soit x 115→365, y 57→307. Taille d'affichage pilotée par --s : fond = 447/250 × s, décalage = -115/250 × s et -57/250 × s. */
@@ -274,25 +283,24 @@ dialog[open]::backdrop{background:rgba(0,0,0,.32);transition-duration:var(--sp-d
 /* allumé : l'image orange est décalée en teinte (--hr) → bleu violacé (note 1) … rouge vif (note 10) */
 .calc.on{filter:hue-rotate(var(--hr,0deg)) saturate(1.6);opacity:1}
 .note .calc{--s:20px;vertical-align:-5px;margin-right:4px}
-h1 .calc{--s:44px}
 /* Note : un seul grand Calcifer + un vrai slider. La couleur suit le curseur en continu (variables posées en JS). */
-.calc.big{--s:72px;filter:hue-rotate(var(--hr,0deg)) saturate(var(--sat,1)) grayscale(var(--g,1)) brightness(var(--b,.55));opacity:var(--o,.45)}
+.calc.big{--s:72px;filter:hue-rotate(var(--hr,0deg)) saturate(var(--sat,1)) grayscale(var(--g,1)) brightness(var(--b,.55));opacity:var(--o,.45);box-shadow:0 0 0 2px var(--rim),0 8px 22px var(--shadow)}
 
-.foot{margin:16px 4px 0;color:var(--md-on-surface-variant);font-size:.8125rem;line-height:1.5}
-.sync{font-weight:500}
-.sync.bad{color:var(--md-error)}
-.foot button{background:none;border:0;padding:6px 12px;margin-left:4px;border-radius:999px;color:var(--md-error);font-weight:500;cursor:pointer}
-@media (hover:hover){.foot button:hover{background:color-mix(in srgb,var(--md-error) 8%,transparent)}}
+.foot{margin:18px 8px 0;color:var(--ink-2);font-size:.875rem;line-height:1.5}
+.sync{font-weight:600}
+.sync.bad{color:var(--danger)}
+.foot button{background:none;border:0;padding:6px 12px;margin-left:4px;border-radius:999px;color:var(--danger);font-weight:600;cursor:pointer}
+@media (hover:hover){.foot button:hover{background:var(--glass-hover)}}
 
 @media (max-width:640px){
-  .draw{padding:16px;gap:16px}
+  .draw{padding:18px;gap:16px;border-radius:30px}
   .draw-main{align-items:stretch}
   .btn-draw{width:100%}
   .result{padding:12px}
-  .tablewrap{overflow-x:visible}
+  .tablewrap{border-radius:30px}
   table,tbody{display:block;min-width:0}
   thead{display:none}
-  tr{display:grid;grid-template-columns:auto 1fr auto auto;grid-template-areas:"p t t t" "p d d d" "p s r n";gap:2px 12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--md-outline-variant)}
+  tr{display:grid;grid-template-columns:auto 1fr auto auto;grid-template-areas:"p t t t" "p d d d" "p s r n";gap:2px 12px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--sep)}
   tr:last-child{border-bottom:0}
   td,th:first-child,td:first-child,td:last-child{padding:0;border:0}
   td{display:block}
@@ -306,19 +314,36 @@ h1 .calc{--s:44px}
   td.r{grid-area:r;margin-top:6px;justify-self:end}
   td.r:empty{display:none}
   tbody tr:hover td{background:none}
-  tr.picked{background:color-mix(in srgb,var(--md-tertiary-container) 70%,transparent)}
+  tr.picked{background:color-mix(in srgb,var(--warm) 26%,transparent)}
   tr.picked td{background:none}
   .poster{width:56px;height:80px}
   .calc.big{--s:64px}
-  .fiche{padding:20px 20px 0}
+  .tab{padding:0 13px;font-size:.875rem}
+  .fiche{padding:22px 22px 0}
   .fiche .poster{width:96px;height:136px}
-  .dialog-actions{flex-direction:column;align-items:stretch;padding:16px 20px 20px}
+  .dialog-actions{flex-direction:column;align-items:stretch;padding:16px 22px 22px}
   .dialog-actions .fiche-close{order:0;margin-right:0}
+}
+
+@media (max-width:420px){
+  .tabs{padding:4px}
+  .ind{top:4px;height:calc(100% - 8px)}
+  .tab{height:40px;padding:0 9px;font-size:.8125rem}
+}
+
+/* accessibilité : sans transparence (réglage système) ou navigateur sans backdrop-filter → surfaces opaques */
+@media (prefers-reduced-transparency:reduce){
+  .draw,.tablewrap,.searchbar,.tabs,dialog,.btn{background:var(--solid);-webkit-backdrop-filter:none;backdrop-filter:none}
+  dialog::backdrop{-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .draw,.tablewrap,.searchbar,.tabs,dialog,.btn{background:var(--solid)}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div class="wrap">
   <h1><span class="calc on" aria-hidden="true"></span>Mes films Ghibli</h1>
   <p class="sub">Coche ceux que tu as vus, puis laisse le hasard choisir le prochain.</p>
@@ -353,6 +378,7 @@ h1 .calc{--s:44px}
   </div>
 
   <div class="tabs" role="group" aria-label="Filtrer">
+    <span class="ind" aria-hidden="true"></span>
     <button class="tab" data-f="all" aria-pressed="true" type="button">Tous</button>
     <button class="tab" data-f="unseen" aria-pressed="false" type="button">Pas vus</button>
     <button class="tab" data-f="seen" aria-pressed="false" type="button">Vus</button>
@@ -676,8 +702,19 @@ document.querySelector(".tabs").addEventListener("click",e=>{
   const b=e.target.closest(".tab"); if(!b) return;
   filter=b.dataset.f;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-pressed",t===b));
+  moveInd();
   render();
 });
+// Indicateur en verre : se place sous l'onglet actif (--x / --w), et glisse avec un ressort quand on change d'onglet.
+function moveInd(){
+  const bar=document.querySelector(".tabs"), b=bar.querySelector('.tab[aria-pressed="true"]');
+  if(!b) return;
+  bar.style.setProperty("--x",b.offsetLeft+"px"); bar.style.setProperty("--w",b.offsetWidth+"px");
+  b.scrollIntoView({block:"nearest",inline:"nearest"}); // barre défilante sur petit écran : garde l'onglet visible
+}
+moveInd(); addEventListener("resize",moveInd);
+// transition activée seulement une fois les mesures stables (évite un glissement parasite au chargement)
+(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>{ moveInd(); requestAnimationFrame(()=>document.querySelector(".tabs").classList.add("ready")); });
 document.body.addEventListener("click",e=>{
   const t=e.target.closest("[data-fiche]");
   if(t){ openFiche(+t.dataset.fiche); return; }

@@ -7,23 +7,25 @@ entre appareils ; sans config Firebase, l'app tourne en mode local (navigateur).
 La barre de recherche filtre la liste (en plus de l'onglet choisi) sur le titre français ou
 original, l'année, le réalisateur et le synopsis, sans tenir compte des accents ni de la casse.
 
-## Design : Material 3
+## Design : Liquid Glass (branche `design/liquid-glass`)
 
-L'interface suit Material Design 3 (Material You) : rôles de couleur, formes arrondies, police
-Roboto, puces de filtre, FAB étendu, interrupteur, barre de recherche, boîte de dialogue, couches
-d'état et ondulation au toucher. Pas de bibliothèque : tout est du CSS au début de `index.html`.
-Les couleurs (clair et sombre, via `light-dark()`) ont été générées avec
-`@material/material-color-utilities` à partir du vert `#3f8f6b`, avec l'ambre de Calcifer en
-tertiaire ; pour changer de palette, régénère les rôles `--md-*` depuis une autre couleur.
-Le thème suit le système, ou se force avec `<html data-theme="light|dark">`.
+Variante d'interface inspirée du « Liquid Glass » d'Apple, à comparer avec la version Material 3 de
+`main`. Pas de bibliothèque : tout est du CSS au début de `index.html`. Les surfaces (carte du tirage,
+liste, barre de recherche, barre de filtres, fiche) sont du verre : fond translucide, flou et saturation de
+ce qui passe derrière (`backdrop-filter`), liseré lumineux plus clair en haut, reflet spéculaire, ombre
+douce. Un fond de grandes taches de couleur floues, qui dérivent lentement, donne de la matière à
+« réfracter ». La barre de recherche reste collée en haut, la barre de filtres flotte en bas avec un
+indicateur en verre qui glisse d'un onglet à l'autre ; les boutons principaux sont du verre teinté (vert,
+ambre de Calcifer). Police du système (SF sur Apple, Segoe UI sur Windows). Le thème suit le système, ou se
+force avec `<html data-theme="light|dark">` ; avec le réglage système « réduire la transparence », ou sans
+`backdrop-filter`, les surfaces deviennent opaques.
 
-Le mouvement suit M3 expressif : des ressorts (rapide, défaut, lent, plus des ressorts « effets » sans
-rebond) définis en variables CSS `--sp-*` / `--fx-*` (courbes `linear()` calculées depuis les
-paramètres de `MotionScheme.expressive` de Compose, repli en Bézier). Au programme : entrée en
-cascade de la page et des lignes, lignes qui glissent quand le filtre change, formes qui se
-déforment à l'appui, coche qui se déploie sur les puces, rebond des étoiles / de « Vu » / de la
-note, dialogue qui s'ouvre et se ferme en douceur, effet « rouleau » du tirage, flamme de Calcifer
-qui respire. Tout est coupé avec « réduire les animations » (réglage d'accessibilité du système).
+Le mouvement reste fluide et élastique : des ressorts (rapide, défaut, lent, plus des ressorts « effets » sans
+rebond) définis en variables CSS `--sp-*` / `--fx-*` (courbes `linear()`, repli en Bézier). Au programme :
+entrée en cascade de la page et des lignes, lignes qui glissent quand le filtre change, éléments qui
+grossissent et s'éclairent à l'appui, rebond des étoiles / de « Vu » / de la note, fiche qui s'ouvre et se ferme
+en douceur, effet « rouleau » du tirage, flamme de Calcifer qui respire. Tout est coupé avec « réduire les
+animations » (réglage d'accessibilité du système).
 
 ## Brancher Firebase (une seule fois)
 
